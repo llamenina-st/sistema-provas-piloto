@@ -896,9 +896,24 @@ function enhanceMobileDatalistSupport(mapCategoryToDatalist, indicadores) {
   
   if (!isMobile) return; // Desktop funciona bem com datalist nativo
   
-  // Para cada campo com datalist, adiciona eventos adicionais
+  // Lista de inputs a processar (incluindo o campo especial de motivo)
+  const inputsToProcess = [];
+  
+  // Adiciona os campos regulares
   Object.entries(mapCategoryToDatalist).forEach(([categoria, datalistId]) => {
     const inputId = datalistId.replace('dl-', 'cad-');
+    inputsToProcess.push({ inputId, datalistId, categoria });
+  });
+  
+  // Adiciona o campo especial de motivo (usa cad-motivo-input)
+  inputsToProcess.push({ 
+    inputId: 'cad-motivo-input', 
+    datalistId: 'dl-motivo', 
+    categoria: 'MOTIVO' 
+  });
+  
+  // Para cada campo com datalist, adiciona funcionalidade customizada
+  inputsToProcess.forEach(({ inputId, datalistId, categoria }) => {
     const input = document.getElementById(inputId);
     
     if (!input) return;
@@ -946,17 +961,35 @@ function enhanceMobileDatalistSupport(mapCategoryToDatalist, indicadores) {
         const option = document.createElement('div');
         option.className = 'custom-datalist-option';
         option.textContent = value;
-        option.addEventListener('click', (e) => {
+        
+        // Usa mousedown e touchstart para capturar antes do blur
+        const selectOption = (e) => {
           e.preventDefault();
           e.stopPropagation();
+          
           input.value = value;
           dropdown.style.display = 'none';
-          input.blur();
+          
+          // Para o campo de motivo, dispara o botão de adicionar automaticamente
+          if (inputId === 'cad-motivo-input') {
+            const btnAddMotivo = document.getElementById('btn-add-motivo');
+            if (btnAddMotivo) {
+              setTimeout(() => {
+                btnAddMotivo.click();
+              }, 50);
+            }
+          } else {
+            input.blur();
+          }
           
           // Dispara evento de input para validações
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
-        });
+        };
+        
+        option.addEventListener('mousedown', selectOption);
+        option.addEventListener('touchstart', selectOption, { passive: false });
+        
         dropdown.appendChild(option);
       });
       
@@ -966,8 +999,11 @@ function enhanceMobileDatalistSupport(mapCategoryToDatalist, indicadores) {
     // Função para esconder dropdown
     const hideDropdown = () => {
       setTimeout(() => {
-        dropdown.style.display = 'none';
-      }, 200);
+        // Não esconde se o usuário está clicando em uma opção
+        if (!dropdown.matches(':hover')) {
+          dropdown.style.display = 'none';
+        }
+      }, 250);
     };
     
     // Eventos do input
@@ -1303,11 +1339,22 @@ function initCadastroForm() {
       renderMotivosTags();
     }
     motivoInput.value = '';
+    
+    // Esconde dropdown customizado se existir
+    const dropdown = motivoInput.parentElement?.querySelector('.custom-datalist-dropdown');
+    if (dropdown) {
+      dropdown.style.display = 'none';
+    }
+    
     motivoInput.focus();
   };
 
   if (btnAddMotivo) {
-    btnAddMotivo.addEventListener('click', addMotivoTag);
+    btnAddMotivo.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      addMotivoTag();
+    });
   }
 
   if (motivoInput) {

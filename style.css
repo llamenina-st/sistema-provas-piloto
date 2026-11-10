@@ -1056,6 +1056,10 @@ img {
   width: 100%;
 }
 
+.motivo-input-row .custom-datalist-wrapper {
+  flex: 1;
+}
+
 .custom-datalist-dropdown {
   position: absolute;
   top: 100%;
@@ -1070,6 +1074,7 @@ img {
   z-index: 1000;
   box-shadow: var(--shadow-md);
   -webkit-overflow-scrolling: touch;
+  margin-top: -1px;
 }
 
 .custom-datalist-option {
@@ -1079,21 +1084,24 @@ img {
   color: var(--color-text-main);
   border-bottom: 1px solid var(--color-border-subtle);
   transition: background-color 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
 
 .custom-datalist-option:last-child {
   border-bottom: none;
 }
 
-.custom-datalist-option:hover,
-.custom-datalist-option:active {
+.custom-datalist-option:hover {
   background-color: var(--color-primary-soft);
   color: var(--color-primary);
 }
 
 .custom-datalist-option:active {
-  background-color: var(--color-primary-light);
+  background-color: var(--color-primary);
   color: #FFFFFF;
+  transform: scale(0.98);
 }
 
 .btn {
@@ -1757,10 +1765,25 @@ input:checked + .slider:before {
   .motivo-input-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .motivo-input-row .form-group-grow {
+    width: 100%;
   }
   
   .motivo-input-row .btn {
     width: 100%;
+  }
+  
+  /* Custom datalist no mobile - ajuste para campo de motivo */
+  .motivo-input-row .custom-datalist-wrapper {
+    width: 100%;
+  }
+  
+  .motivo-input-row .custom-datalist-dropdown {
+    left: 0;
+    right: 0;
   }
   
   /* Botões */
