@@ -1,0 +1,1900 @@
+/* ==========================================================================
+   SISTEMA PROVA DE PILOTO — ILA
+   Folha de Estilos Principal (Web SPA + Impressão A4 Fiel ao Modelo)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. VARIÁVEIS DE DESIGN E RESET
+   -------------------------------------------------------------------------- */
+:root {
+  /* Paleta Marsala/Bordô (Inspirada no logotipo LLA) */
+  --color-primary: #722F37;
+  --color-primary-light: #8B3A42;
+  --color-primary-dark: #501F25;
+  --color-primary-soft: #F9EBEB;
+  
+  /* Cores de Apoio / Neutros */
+  --color-bg: #F4F6F9;
+  --color-card-bg: #FFFFFF;
+  --color-text-main: #1E293B;
+  --color-text-muted: #64748B;
+  --color-text-light: #94A3B8;
+  --color-border: #E2E8F0;
+  --color-border-subtle: #F1F5F9;
+
+  /* KPIs e Status */
+  --kpi-total: #1E3A5F;
+  --kpi-piloto: #0284C7;
+  --kpi-repilotagem: #D97706;
+  --kpi-aprovada: #16A34A;
+  --kpi-reprovada: #DC2626;
+  --kpi-standby: #64748B;
+
+  /* Metas */
+  --meta-success-bg: #DCFCE7;
+  --meta-success-text: #15803D;
+  --meta-success-border: #86EFAC;
+  --meta-danger-bg: #FEE2E2;
+  --meta-danger-text: #B91C1C;
+  --meta-danger-border: #FCA5A5;
+
+  /* Pareto e Gráficos */
+  --pareto-bar: #0ea5e9;
+  --pareto-line: #ef4444;
+
+  /* Utilitários */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  --font-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --header-height: 64px;
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html {
+  font-size: 14px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --------------------------------------------------------------------------
+   2. TELA DE LOGIN
+   -------------------------------------------------------------------------- */
+#view-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at top right, #8B3A42, #501F25 80%);
+  padding: 1.5rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.login-logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.login-logo-row img {
+  display: block;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+/* Especificidade maior que .login-card h1 para garantir o lado a lado */
+.login-logo-row h1,
+.login-card .login-logo-row h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.login-card h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 0.25rem;
+}
+
+.login-subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.login-error {
+  background-color: #FEF2F2;
+  border-left: 4px solid var(--color-primary);
+  color: #991B1B;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  text-align: left;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   3. APP CONTAINER & SHELL LAYOUT (ETAPA 1: SIDEBAR TOGGLE & HEADER)
+   -------------------------------------------------------------------------- */
+#app-container {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+/* Header */
+#app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  background: var(--color-card-bg);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hamburger-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-main);
+  transition: all 0.15s ease;
+}
+
+.hamburger-btn:hover {
+  background-color: var(--color-border-subtle);
+  border-color: var(--color-primary);
+}
+
+.header-logo {
+  border-radius: var(--radius-sm);
+}
+
+.header-app-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.header-greeting {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+}
+
+.header-greeting #user-name {
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.role-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+  letter-spacing: 0.05em;
+}
+
+/* Sidebar */
+#sidebar {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background: #1E293B;
+  color: #F8FAFC;
+  padding: 1.5rem 0;
+  z-index: 90;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s ease-in-out;
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0 0.75rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.8rem 1rem;
+  color: #94A3B8;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  transition: all 0.15s ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #FFFFFF;
+}
+
+.nav-item.active {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--kpi-reprovada);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Sidebar Recolhida no Desktop (ETAPA 1) */
+body.sidebar-collapsed #sidebar {
+  width: var(--sidebar-collapsed-width);
+}
+
+body.sidebar-collapsed #sidebar .nav-item {
+  padding: 0.8rem 0;
+  justify-content: center;
+}
+
+body.sidebar-collapsed #sidebar .nav-item span {
+  display: none;
+}
+
+body.sidebar-collapsed #sidebar .nav-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.65rem;
+  min-width: 14px;
+}
+
+body.sidebar-collapsed #main-content {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
+/* Main Content Wrapper */
+#main-content {
+  margin-top: var(--header-height);
+  margin-left: var(--sidebar-width);
+  padding: 2rem;
+  flex: 1;
+  max-width: 1600px;
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --------------------------------------------------------------------------
+   4. CABEÇALHO DO RELATÓRIO COM LOGO À ESQUERDA (ETAPA 1: REORGANIZAÇÃO)
+   -------------------------------------------------------------------------- */
+.report-header-banner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.report-header-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  padding: 0;
+  width: auto;
+  min-width: 0;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.report-header-logo {
+  width: 56px;
+  height: 56px;
+  max-height: 56px;
+  object-fit: contain;
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+.report-header-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.report-header-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.report-header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--color-primary);
+}
+
+/* --------------------------------------------------------------------------
+   5. TÍTULOS DE SEÇÃO ALINHADOS À ESQUERDA (ETAPA 1: CORREÇÃO DE ALINHAMENTO)
+   -------------------------------------------------------------------------- */
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  border-left: 4px solid #0284C7;
+  padding-left: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start !important; /* Força firme alinhamento à esquerda */
+  text-align: left !important;
+}
+
+/* Variante centralizada — reservada para uso futuro */
+
+.section-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.section-title-bar .section-title {
+  margin: 0;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.inline-filter-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.filter-select-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   6. BARRA DE FILTROS & BOTÕES REDIMENSIONADOS (ETAPA 1)
+   -------------------------------------------------------------------------- */
+.filters-bar {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.filters-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr) auto;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.filter-group label {
+  font-size: 0.775rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+.filter-actions-group {
+  align-self: flex-end;
+}
+
+.filters-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filters-actions .btn {
+  height: 38px;
+  padding: 0 1rem;
+}
+
+/* Controles de Impressão (Tela) */
+.print-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--color-text-main);
+}
+
+/* --------------------------------------------------------------------------
+   7. KPIS LADO A LADO COM METAS CONFIGURÁVEIS (ETAPA 2)
+   -------------------------------------------------------------------------- */
+.kpi-grid-container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.kpi-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-top: 4px solid #CBD5E1;
+  min-height: 115px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.kpi-card.kpi-blue-dark { border-top-color: var(--kpi-total); }
+.kpi-card.kpi-blue      { border-top-color: var(--kpi-piloto); }
+.kpi-card.kpi-orange    { border-top-color: var(--kpi-repilotagem); }
+.kpi-card.kpi-green     { border-top-color: var(--kpi-aprovada); }
+.kpi-card.kpi-red       { border-top-color: var(--kpi-reprovada); }
+.kpi-card.kpi-gray      { border-top-color: var(--kpi-standby); }
+.kpi-card.kpi-yellow    { border-top-color: #CA8A04; }
+
+.kpi-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.kpi-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--color-text-main);
+}
+
+.kpi-subtext {
+  font-size: 0.775rem;
+  color: var(--color-text-muted);
+  margin-top: 0.35rem;
+}
+
+.kpi-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  gap: 0.25rem;
+}
+
+.kpi-pct {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.kpi-meta-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.kpi-meta-badge.success {
+  background-color: var(--meta-success-bg);
+  color: var(--meta-success-text);
+  border: 1px solid var(--meta-success-border);
+}
+
+.kpi-meta-badge.danger {
+  background-color: var(--meta-danger-bg);
+  color: var(--meta-danger-text);
+  border: 1px solid var(--meta-danger-border);
+}
+
+.kpi-meta-badge.info {
+  background-color: #E0F2FE;
+  color: #0369A1;
+  border: 1px solid #BAE6FD;
+}
+
+/* Painel de Metas na Aba Configurações */
+.metas-config-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.card-header-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--color-primary);
+}
+
+.card-subtitle {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 0.2rem;
+}
+
+.input-with-suffix {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-suffix input {
+  padding-right: 2.25rem;
+}
+
+.input-with-suffix .suffix {
+  position: absolute;
+  right: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.helper-text {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+.form-actions-right {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+
+.config-subheading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-text-main);
+}
+
+/* --------------------------------------------------------------------------
+   8. TABELAS & PARETO CHARTS
+   -------------------------------------------------------------------------- */
+.table-responsive {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.data-table th, .data-table td {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table th {
+  background-color: #F8FAFC;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+}
+
+.data-table tbody tr:hover {
+  background-color: #F8FAFC;
+}
+
+.data-table tfoot tr {
+  font-weight: 700;
+  background-color: #F1F5F9;
+  border-top: 2px solid var(--color-border);
+}
+
+.data-table .num-col {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Containers de Gráficos com Headroom (ETAPA 3) */
+.chart-container {
+  position: relative;
+  height: 280px;
+  width: 100%;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-container-wide {
+  height: 340px;
+}
+
+.chart-container-donut {
+  height: 260px;
+  max-width: 380px;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.pareto-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.pareto-table th, .pareto-table td {
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+}
+
+.pareto-table th {
+  background-color: #F8FAFC;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.pareto-table td:first-child {
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.pareto-table th:nth-child(2),
+.pareto-table td:nth-child(2) {
+  text-align: right;
+  width: 140px;
+}
+
+.pareto-table th:nth-child(3),
+.pareto-table td:nth-child(3) {
+  text-align: right;
+  font-weight: 700;
+  width: 100px;
+}
+
+/* Painel de Eficiência em Repilotagens */
+.efficiency-row {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.efficiency-card {
+  text-align: center;
+  padding: 1.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.efficiency-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #166534;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.efficiency-value {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #15803D;
+  line-height: 1.1;
+  margin: 0.5rem 0;
+}
+
+.efficiency-subtext {
+  font-size: 0.8rem;
+  color: #166534;
+}
+
+/* --------------------------------------------------------------------------
+   9. ANÁLISE DETALHADA DE OBSERVAÇÕES E MOTIVOS (ETAPA 4)
+   -------------------------------------------------------------------------- */
+.obs-toolbar {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1.5fr;
+  gap: 1rem;
+  background: #F8FAFC;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  align-items: flex-end;
+}
+
+.obs-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.obs-filter-group label {
+  font-size: 0.775rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.search-input-wrapper {
+  position: relative;
+}
+
+.search-input-wrapper input {
+  padding-left: 0.85rem;
+}
+
+.obs-summary-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(114, 47, 55, 0.2);
+}
+
+.obs-table td {
+  vertical-align: top;
+}
+
+.motivo-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid #BFDBFE;
+  margin-right: 0.3rem;
+  margin-bottom: 0.2rem;
+}
+
+/* --------------------------------------------------------------------------
+   10. FORMULÁRIO DE CADASTRO SEM SOBREPOSIÇÃO (ETAPA 5)
+   -------------------------------------------------------------------------- */
+.form-cadastro {
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-row.three-cols {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+.form-fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  background-color: #FAFAFA;
+}
+
+.form-fieldset legend {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  padding: 0 0.5rem;
+}
+
+.motivo-input-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.motivo-input-row .form-group-grow {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  min-height: 38px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 0.825rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(114, 47, 55, 0.2);
+}
+
+.tag-chip button.remove-tag {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 0.2rem;
+  border-radius: 50%;
+}
+
+textarea#cad-observacao {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.75rem 1rem;
+  line-height: 1.5;
+  resize: vertical;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+/* --------------------------------------------------------------------------
+   11. COMPONENTES GERAIS (BOTÕES, FILA DE APROVAÇÃO, MODAIS)
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-light);
+}
+
+.btn-success {
+  background-color: var(--kpi-aprovada);
+  color: #FFFFFF;
+}
+.btn-success:hover {
+  background-color: #15803D;
+}
+
+.btn-danger {
+  background-color: var(--kpi-reprovada);
+  color: #FFFFFF;
+}
+.btn-danger:hover {
+  background-color: #B91C1C;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text-main);
+}
+.btn-outline:hover {
+  background-color: var(--color-border-subtle);
+  border-color: #CBD5E1;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.825rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.form-group label span.required,
+label span.required {
+  color: var(--kpi-reprovada);
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+input[type="search"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: #FFFFFF;
+  color: var(--color-text-main);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(114, 47, 55, 0.15);
+}
+
+/* Fila de Aprovação */
+.aprovacao-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-bar {
+  position: relative;
+  max-width: 380px;
+  width: 100%;
+}
+
+.search-bar input {
+  padding-left: 2.25rem;
+}
+
+.search-bar .search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  width: 16px;
+  height: 16px;
+}
+
+.termo-novo {
+  background-color: #FEF9C3 !important;
+  color: #854D0E !important;
+  font-weight: 600;
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+/* Config Tabs */
+.config-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab-btn.active {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+}
+
+.config-add-form {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #CBD5E1;
+  transition: .2s;
+  border-radius: 22px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .2s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--kpi-aprovada);
+}
+
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* Modais */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 500px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: slideDown 0.2s ease-out;
+}
+
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background-color: #F8FAFC;
+}
+
+/* Toasts */
+#toast-container {
+  position: fixed;
+  top: calc(var(--header-height) + 1rem);
+  right: 1.5rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  min-width: 300px;
+  max-width: 450px;
+  background: #FFFFFF;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-left: 4px solid var(--color-primary);
+  animation: slideInRight 0.25s ease-out;
+}
+
+.toast.toast-success { border-left-color: var(--kpi-aprovada); }
+.toast.toast-error   { border-left-color: var(--kpi-reprovada); }
+.toast.toast-warning { border-left-color: var(--kpi-repilotagem); }
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-spinner {
+  text-align: center;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 0.75rem auto;
+}
+
+/* --------------------------------------------------------------------------
+   12. ANIMAÇÕES E RESPONSIVIDADE
+   -------------------------------------------------------------------------- */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 1280px) {
+  .kpi-grid-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .filters-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .filters-actions {
+    grid-column: span 3;
+  }
+  .obs-toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .efficiency-row {
+    grid-template-columns: 1fr;
+  }
+  .chart-container-donut {
+    margin: 0 auto;
+  }
+  .form-row.three-cols {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  #sidebar {
+    transform: translateX(-100%);
+  }
+  #sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+  #sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 80;
+  }
+  #main-content {
+    margin-left: 0 !important;
+    padding: 1rem;
+  }
+  .kpi-grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .report-header-banner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .report-header-text {
+    text-align: center;
+  }
+  .report-header-meta {
+    justify-content: center;
+  }
+  .filters-row {
+    grid-template-columns: 1fr;
+  }
+  .filters-actions {
+    grid-column: span 1;
+  }
+  .obs-toolbar {
+    grid-template-columns: 1fr;
+  }
+  .form-row.three-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   13. REGRAS DE IMPRESSÃO A4 (@media print) — LAYOUT PROPORCIONAL E INTELIGENTE
+   - Regra de ouro: Cada seção/gráfico só fica na página se couber inteira
+     (page-break-inside: avoid; break-inside: avoid;), sem quebras artificiais
+     ou achatamento forçado de elementos.
+   - Exceção: Análise Detalhada de Observações pode quebrar naturalmente entre páginas.
+   - Indicadores iniciais (KPIs): compactos, elegantes e proporcionalmente contidos.
+   - Sem sobreposição: alturas adequadas para os canvases do Chart.js e tabelas.
+   -------------------------------------------------------------------------- */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 10mm 10mm 10mm;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html, body {
+    background: #FFFFFF !important;
+    color: #0F172A !important;
+    font-size: 8.5pt !important;
+    line-height: 1.3 !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .no-print,
+  #app-header,
+  #sidebar,
+  #sidebar-overlay,
+  #dashboard-filters,
+  .print-controls,
+  #toast-container,
+  #loading-overlay,
+  .modal-overlay,
+  #view-login,
+  #view-cadastro,
+  #view-aprovacao,
+  #view-config,
+  .btn,
+  .btn-icon,
+  .chart-toggle,
+  .obs-toolbar,
+  .obs-summary-badge,
+  .efficiency-filter-container,
+  .modelista-filter-group {
+    display: none !important;
+  }
+
+  #app-container, #main-content, #view-dashboard {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  /* Cabeçalho Oficial com Logo à Esquerda e Metadados */
+  .report-header-banner {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid #0F172A !important;
+    border-radius: 0 !important;
+    padding: 0 0 6px 0 !important;
+    margin-bottom: 8px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .report-header-logo-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    flex-shrink: 0 !important;
+  }
+
+  .report-header-logo {
+    display: block !important;
+    width: 46px !important;
+    height: 46px !important;
+    max-height: 46px !important;
+    object-fit: contain !important;
+    border-radius: 4px !important;
+  }
+
+  .report-header-title {
+    font-size: 15pt !important;
+    font-weight: 800 !important;
+    color: #0F172A !important;
+    margin: 0 0 3px 0 !important;
+    line-height: 1.1 !important;
+  }
+
+  .report-header-text {
+    flex: 1 !important;
+    text-align: left !important;
+  }
+
+  .report-header-meta {
+    font-size: 7.5pt !important;
+    gap: 3px 12px !important;
+    color: #334155 !important;
+    line-height: 1.25 !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+
+  .meta-icon {
+    display: none !important;
+  }
+
+  /* Indicadores Iniciais (KPIs) Compactos e Proporcionais (Não ocupam espaço exagerado) */
+  .kpi-grid-container {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 6px !important;
+    margin-bottom: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .kpi-card {
+    padding: 5px 6px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    border-top: 3px solid !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    min-height: auto !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .kpi-card.kpi-blue-dark { border-top-color: #0369A1 !important; }
+  .kpi-card.kpi-blue      { border-top-color: #0284C7 !important; }
+  .kpi-card.kpi-orange    { border-top-color: #D97706 !important; }
+  .kpi-card.kpi-green     { border-top-color: #16A34A !important; }
+  .kpi-card.kpi-red       { border-top-color: #DC2626 !important; }
+  .kpi-card.kpi-gray      { border-top-color: #64748B !important; }
+  .kpi-card.kpi-yellow    { border-top-color: #CA8A04 !important; }
+
+  .kpi-label {
+    font-size: 6pt !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    margin: 0 0 2px 0 !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+  }
+
+  .kpi-value {
+    font-size: 13pt !important;
+    font-weight: 800 !important;
+    color: #0F172A !important;
+    line-height: 1.1 !important;
+    margin: 0 0 2px 0 !important;
+  }
+
+  .kpi-subtext {
+    font-size: 5.5pt !important;
+    color: #64748B !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+  }
+
+  .kpi-meta-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 2px !important;
+    margin: 0 !important;
+  }
+
+  .kpi-pct {
+    font-size: 6pt !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+  }
+
+  .kpi-meta-badge {
+    font-size: 5pt !important;
+    padding: 0.5px 3px !important;
+    border-radius: 2px !important;
+    border: 1px solid #CBD5E1 !important;
+    line-height: 1 !important;
+  }
+
+  /* Títulos de Seção Alinhados à Esquerda com barra azul */
+  .section-title {
+    border-left: 4px solid #0284C7 !important;
+    padding-left: 6px !important;
+    font-size: 10pt !important;
+    font-weight: 800 !important;
+    color: #0F172A !important;
+    margin-top: 10px !important;
+    margin-bottom: 4px !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .section-title-bar {
+    margin-top: 10px !important;
+    margin-bottom: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .section-title-bar .section-title {
+    margin: 0 !important;
+  }
+
+  /* REGRA MESTRE DE QUEBRA: Toda seção e gráfico deve caber inteira ou mover para a próxima página */
+  .dashboard-section,
+  .pareto-section {
+    margin-bottom: 10px !important;
+    padding: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Respeita quebra natural sem forçar página vazia */
+  .page-break-before {
+    page-break-before: auto !important;
+    break-before: auto !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Tabelas Dimensionadas e Nítidas */
+  .table-responsive {
+    border: 1px solid #CBD5E1 !important;
+    box-shadow: none !important;
+    margin-bottom: 6px !important;
+    overflow: visible !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .data-table, .pareto-table {
+    width: 100% !important;
+    font-size: 7.5pt !important;
+    line-height: 1.25 !important;
+    border-collapse: collapse !important;
+  }
+
+  .data-table th, .data-table td,
+  .pareto-table th, .pareto-table td {
+    padding: 3px 5px !important;
+    border: 1px solid #D1D5DB !important;
+  }
+
+  .data-table th, .pareto-table th {
+    background-color: #F8FAFC !important;
+    color: #0F172A !important;
+    font-weight: 700 !important;
+  }
+
+  /* Centralizar cabeçalhos das tabelas de Resumo por Segmento e Análise Detalhada na impressão */
+  #tabela-resumo-segmento th,
+  #tabela-analise-observacoes th {
+    text-align: center !important;
+  }
+
+  /* Gráficos de Pareto: Altura adequada para que o canvas, títulos e legendas respirem sem sobreposição */
+  .chart-container {
+    height: 185px !important;
+    min-height: 185px !important;
+    max-height: 185px !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 4px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    position: relative !important;
+  }
+
+  .chart-container canvas {
+    max-height: 185px !important;
+    width: 100% !important;
+  }
+
+  /* Gráfico de Modelista: Amplo e Legível com as barras largas e valores no topo */
+  .chart-container-wide {
+    height: 230px !important;
+    min-height: 230px !important;
+    max-height: 230px !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 6px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    position: relative !important;
+  }
+
+  .chart-container-wide canvas {
+    max-height: 230px !important;
+    width: 100% !important;
+  }
+
+  /* Painel de Eficiência de Repilotagens */
+  .efficiency-row {
+    display: grid !important;
+    grid-template-columns: 260px 1fr !important;
+    gap: 12px !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 4px !important;
+    padding: 8px !important;
+    margin-bottom: 8px !important;
+    min-height: 175px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .efficiency-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 4px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .efficiency-kpi {
+    text-align: center !important;
+  }
+
+  .efficiency-kpi-rate {
+    font-size: 22pt !important;
+    font-weight: 800 !important;
+    color: #16A34A !important;
+    line-height: 1 !important;
+    margin: 4px 0 !important;
+  }
+
+  .efficiency-kpi-sub {
+    font-size: 7pt !important;
+    color: #64748B !important;
+    margin-top: 3px !important;
+  }
+
+  .donut-container {
+    height: 155px !important;
+    min-height: 155px !important;
+    max-height: 155px !important;
+    position: relative !important;
+  }
+
+  .donut-container canvas {
+    max-height: 155px !important;
+    width: 100% !important;
+  }
+
+  /* EXCEÇÃO: Painel de Observações pode quebrar naturalmente entre páginas conforme o volume */
+  #section-observacoes {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    margin-bottom: 8px !important;
+  }
+
+  #section-observacoes .table-responsive {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin-bottom: 6px !important;
+  }
+
+  #section-observacoes tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  #section-observacoes .obs-table td {
+    padding: 3px 4px !important;
+    font-size: 7pt !important;
+    line-height: 1.2 !important;
+  }
+
+  #section-observacoes .motivo-count-pill {
+    font-size: 6pt !important;
+    padding: 1px 3px !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 3px !important;
+    background: #F8FAFC !important;
+    display: inline-block !important;
+    margin: 1px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Rodapé do Relatório */
+  #print-timestamp {
+    text-align: right !important;
+    font-size: 7pt !important;
+    color: #64748B !important;
+    margin-top: 8px !important;
+    border-top: 1px solid #E2E8F0 !important;
+    padding-top: 4px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .print-obs-annex {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+}

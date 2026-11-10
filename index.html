@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Relatório Prova de Piloto — Sistema de gestão e aprovação de ordens de produção">
+  <title>Prova de Piloto - LLA</title>
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAE0UlEQVR4AexXa2wUVRT+9tmHbaW1rBVpNBYkMWL4IRFKiMYHKiWg9QeYEC1gMRIjpqGi9fFDSlNBEwNRotsGURMbo6SNwQRrIEYrGI0xGPxVCSZIYCkUaNmm3V2W+w3sZHd22M5tZ+8uzdzkzNx75p7Hd869595xr0cgPpXJjSneHIA3eoKdDDoZzPMIOEs0zxM0rntOBscNUZ5PcDKY5wka1z1bMxjFeVxCSKcR0UeOm20ACW5e4zq0HDqs0yv7ezGGUE4h2gbwMsZQeecduGfBAzrdv+RRxHIKD7ANoBmOWDRqxlbKkwYYQ1jkKqQTl+ZkPU7WSX1x2BcYKYAxAa6mvg61zZt1mif23UT2GUGwCLEoBRbN1/XNqn9aLOthrVARuDF4lDPyMo2lAI5hGA++8Dwat7Xr9NzWdzGSyYLJNwYkgnNo+KoLn168iLZfDuj63vi2C53xUa1QVT1UqwGlCgIjlc69S1s95FkhKYBUGB2L8KVTZHRU71vpMGt3169ERySCh1etRHFpqakYi1Xrwf1Y3bkbFxDSsrqmZw/qWjZp2WaQTAUNTGmABnmpIZ26b3UDmCWP12tJ9om1DdjY8x08KIGvsBCDJ0+houo2S7KcpAwgl1dh+Uxs+mI37aZReGgIF84MpPHJWLh8GeY3N+LQN3vhLfDj510d8KGCn8YlZQDDYs+t60oHN3Dif2ypewoNZWVoDEzHi65b8ccPP6Y5vratFX3BXeh+eQPC/SfhgrUVoARgHFEUi4jz4E/2nFlrqp6JY9/3oBwBjTh32+OPpYHkkn5EVG/KuyyC41wlAGMYRvXSxbSXQj07PxZ7C/AjoPNd8GKaCEbnqjUwtjmLakWxMXIzj5UApAteUSD4TqajvQcEwJJkltYnyLODJ8AMa4xrD59L3l15iWvGbpRXXgLkPpwx697rnpEywVUC0AU/hk6HtMLBCkn65/BvGDl7Dm7xzehwWFTc5VveMrInNHZPSEpSyCNqaKjvd+wQ1TFB7QsXYOjvY+B+S1Y3ghDmLF2h3XKS+RPtKwFI55gpj+gkU0RkircbEoENIoTF4ih4e1+3VmBiNvxuKQEYF+cgL8nLPvgQS7a2mxIv3sHQGe3SLeKA1idXoHvHR+xOipQA5DlYObsGzzRtxLMtm02JF++bp1dqYHhl6+87iPIZVdp4Mg8lAGUdDDY1i+IDlFXcIiuaNj/vAAZfex1HvvxM3GeA4rLSNIdlGdIAvX5fig1fQUHKOGkg1eWx8ersufh1+3soQkDsWuD2mpoUHfxdSmFYGLgtzNGn+FGCnzr2gFFO0OdvviMcQsbmEXKnjxxNkUvI71y/AS9VVKNNHBvD/cfhx9V7aZHQ+PX291Nkej/pgF/ogkSTAsjz7N+9+7QoM9Kkv4KdwuhVp65n1yUWHH9xON9If4pfoNhgGDchIO6lxUg0AjXOpW36kJhj5S0FkAppgMYT5MU0WGkEmZAxvvnNTIdxHm2bzcvEkwaYSZnxG//hjDzVY9sA8qYycPw/sFjwrpkgj2pEBnu2AeRS5X7kHTNx3+Sby8xgU+nQNoD0miCLRLFIJvJzSe5cGldh2wGoIsrZtOFkMJvRVaHbyaCKKGfThpPBbEZXhW4ngyqirNnI0mPKZ/AKAAAA//8m7uk5AAAABklEQVQDAEbV7Ggy/c7eAAAAAElFTkSuQmCC" type="image/png">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+  <!-- ==================== TELA DE LOGIN ==================== -->
+  <section id="view-login" aria-label="Autenticação do usuário">
+    <div class="login-card">
+      <div class="login-logo-row">
+        <img
+          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAE0UlEQVR4AexXa2wUVRT+9tmHbaW1rBVpNBYkMWL4IRFKiMYHKiWg9QeYEC1gMRIjpqGi9fFDSlNBEwNRotsGURMbo6SNwQRrIEYrGI0xGPxVCSZIYCkUaNmm3V2W+w3sZHd22M5tZ+8uzdzkzNx75p7Hd869595xr0cgPpXJjSneHIA3eoKdDDoZzPMIOEs0zxM0rntOBscNUZ5PcDKY5wka1z1bMxjFeVxCSKcR0UeOm20ACW5e4zq0HDqs0yv7ezGGUE4h2gbwMsZQeecduGfBAzrdv+RRxHIKD7ANoBmOWDRqxlbKkwYYQ1jkKqQTl+ZkPU7WSX1x2BcYKYAxAa6mvg61zZt1mif23UT2GUGwCLEoBRbN1/XNqn9aLOthrVARuDF4lDPyMo2lAI5hGA++8Dwat7Xr9NzWdzGSyYLJNwYkgnNo+KoLn168iLZfDuj63vi2C53xUa1QVT1UqwGlCgIjlc69S1s95FkhKYBUGB2L8KVTZHRU71vpMGt3169ERySCh1etRHFpqakYi1Xrwf1Y3bkbFxDSsrqmZw/qWjZp2WaQTAUNTGmABnmpIZ26b3UDmCWP12tJ9om1DdjY8x08KIGvsBCDJ0+houo2S7KcpAwgl1dh+Uxs+mI37aZReGgIF84MpPHJWLh8GeY3N+LQN3vhLfDj510d8KGCn8YlZQDDYs+t60oHN3Dif2ypewoNZWVoDEzHi65b8ccPP6Y5vratFX3BXeh+eQPC/SfhgrUVoARgHFEUi4jz4E/2nFlrqp6JY9/3oBwBjTh32+OPpYHkkn5EVG/KuyyC41wlAGMYRvXSxbSXQj07PxZ7C/AjoPNd8GKaCEbnqjUwtjmLakWxMXIzj5UApAteUSD4TqajvQcEwJJkltYnyLODJ8AMa4xrD59L3l15iWvGbpRXXgLkPpwx697rnpEywVUC0AU/hk6HtMLBCkn65/BvGDl7Dm7xzehwWFTc5VveMrInNHZPSEpSyCNqaKjvd+wQ1TFB7QsXYOjvY+B+S1Y3ghDmLF2h3XKS+RPtKwFI55gpj+gkU0RkircbEoENIoTF4ih4e1+3VmBiNvxuKQEYF+cgL8nLPvgQS7a2mxIv3sHQGe3SLeKA1idXoHvHR+xOipQA5DlYObsGzzRtxLMtm02JF++bp1dqYHhl6+87iPIZVdp4Mg8lAGUdDDY1i+IDlFXcIiuaNj/vAAZfex1HvvxM3GeA4rLSNIdlGdIAvX5fig1fQUHKOGkg1eWx8ersufh1+3soQkDsWuD2mpoUHfxdSmFYGLgtzNGn+FGCnzr2gFFO0OdvviMcQsbmEXKnjxxNkUvI71y/AS9VVKNNHBvD/cfhx9V7aZHQ+PX291Nkej/pgF/ogkSTAsjz7N+9+7QoM9Kkv4KdwuhVp65n1yUWHH9xON9If4pfoNhgGDchIO6lxUg0AjXOpW36kJhj5S0FkAppgMYT5MU0WGkEmZAxvvnNTIdxHm2bzcvEkwaYSZnxG//hjDzVY9sA8qYycPw/sFjwrpkgj2pEBnu2AeRS5X7kHTNx3+Sby8xgU+nQNoD0miCLRLFIJvJzSe5cGldh2wGoIsrZtOFkMJvRVaHbyaCKKGfThpPBbEZXhW4ngyqirNnI0mPKZ/AKAAAA//8m7uk5AAAABklEQVQDAEbV7Ggy/c7eAAAAAElFTkSuQmCC"
+          alt="Logotipo LLA"
+          width="56"
+          height="56"
+        >
+        <h1>Prova de Piloto - LLA</h1>
+      </div>
+      <p class="login-subtitle">Acesse sua conta para continuar</p>
+      <form id="form-login" aria-label="Formulário de login" novalidate>
+        <div class="form-group">
+          <label for="usuario">Usuário</label>
+          <input type="text" id="usuario" name="usuario" autocomplete="username" required placeholder="Digite seu usuário">
+        </div>
+        <div class="form-group">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" name="senha" autocomplete="current-password" required placeholder="Digite sua senha">
+        </div>
+        <div id="login-error" class="login-error" role="alert" aria-live="assertive" hidden></div>
+        <button type="submit" id="btn-login" class="btn btn-primary btn-block">Entrar</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ==================== SHELL DO APLICATIVO ==================== -->
+  <div id="app-container" hidden>
+
+    <!-- Cabeçalho Principal -->
+    <header id="app-header" class="no-print" role="banner">
+      <div class="header-left">
+        <button id="btn-hamburger" class="btn-icon hamburger-btn" aria-label="Alternar menu lateral" title="Recolher / Expandir Menu">
+          <i data-lucide="menu" aria-hidden="true"></i>
+        </button>
+        <img
+          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAE0UlEQVR4AexXa2wUVRT+9tmHbaW1rBVpNBYkMWL4IRFKiMYHKiWg9QeYEC1gMRIjpqGi9fFDSlNBEwNRotsGURMbo6SNwQRrIEYrGI0xGPxVCSZIYCkUaNmm3V2W+w3sZHd22M5tZ+8uzdzkzNx75p7Hd869595xr0cgPpXJjSneHIA3eoKdDDoZzPMIOEs0zxM0rntOBscNUZ5PcDKY5wka1z1bMxjFeVxCSKcR0UeOm20ACW5e4zq0HDqs0yv7ezGGUE4h2gbwMsZQeecduGfBAzrdv+RRxHIKD7ANoBmOWDRqxlbKkwYYQ1jkKqQTl+ZkPU7WSX1x2BcYKYAxAa6mvg61zZt1mif23UT2GUGwCLEoBRbN1/XNqn9aLOthrVARuDF4lDPyMo2lAI5hGA++8Dwat7Xr9NzWdzGSyYLJNwYkgnNo+KoLn168iLZfDuj63vi2C53xUa1QVT1UqwGlCgIjlc69S1s95FkhKYBUGB2L8KVTZHRU71vpMGt3169ERySCh1etRHFpqakYi1Xrwf1Y3bkbFxDSsrqmZw/qWjZp2WaQTAUNTGmABnmpIZ26b3UDmCWP12tJ9om1DdjY8x08KIGvsBCDJ0+houo2S7KcpAwgl1dh+Uxs+mI37aZReGgIF84MpPHJWLh8GeY3N+LQN3vhLfDj510d8KGCn8YlZQDDYs+t60oHN3Dif2ypewoNZWVoDEzHi65b8ccPP6Y5vratFX3BXeh+eQPC/SfhgrUVoARgHFEUi4jz4E/2nFlrqp6JY9/3oBwBjTh32+OPpYHkkn5EVG/KuyyC41wlAGMYRvXSxbSXQj07PxZ7C/AjoPNd8GKaCEbnqjUwtjmLakWxMXIzj5UApAteUSD4TqajvQcEwJJkltYnyLODJ8AMa4xrD59L3l15iWvGbpRXXgLkPpwx697rnpEywVUC0AU/hk6HtMLBCkn65/BvGDl7Dm7xzehwWFTc5VveMrInNHZPSEpSyCNqaKjvd+wQ1TFB7QsXYOjvY+B+S1Y3ghDmLF2h3XKS+RPtKwFI55gpj+gkU0RkircbEoENIoTF4ih4e1+3VmBiNvxuKQEYF+cgL8nLPvgQS7a2mxIv3sHQGe3SLeKA1idXoHvHR+xOipQA5DlYObsGzzRtxLMtm02JF++bp1dqYHhl6+87iPIZVdp4Mg8lAGUdDDY1i+IDlFXcIiuaNj/vAAZfex1HvvxM3GeA4rLSNIdlGdIAvX5fig1fQUHKOGkg1eWx8ersufh1+3soQkDsWuD2mpoUHfxdSmFYGLgtzNGn+FGCnzr2gFFO0OdvviMcQsbmEXKnjxxNkUvI71y/AS9VVKNNHBvD/cfhx9V7aZHQ+PX291Nkej/pgF/ogkSTAsjz7N+9+7QoM9Kkv4KdwuhVp65n1yUWHH9xON9If4pfoNhgGDchIO6lxUg0AjXOpW36kJhj5S0FkAppgMYT5MU0WGkEmZAxvvnNTIdxHm2bzcvEkwaYSZnxG//hjDzVY9sA8qYycPw/sFjwrpkgj2pEBnu2AeRS5X7kHTNx3+Sby8xgU+nQNoD0miCLRLFIJvJzSe5cGldh2wGoIsrZtOFkMJvRVaHbyaCKKGfThpPBbEZXhW4ngyqirNnI0mPKZ/AKAAAA//8m7uk5AAAABklEQVQDAEbV7Ggy/c7eAAAAAElFTkSuQmCC"
+          alt="Logotipo LLA"
+          class="header-logo"
+          width="32"
+          height="32"
+        >
+        <span class="header-app-name">Prova de Piloto - LLA</span>
+      </div>
+      <div class="header-right">
+        <span class="header-greeting">Olá, <span id="user-name"></span></span>
+        <span id="user-role" class="role-badge"></span>
+        <button id="btn-logout" class="btn btn-outline btn-sm" aria-label="Sair do sistema">
+          <i data-lucide="log-out" aria-hidden="true"></i>
+          Sair
+        </button>
+      </div>
+    </header>
+
+    <!-- Navegação Lateral -->
+    <aside id="sidebar" class="no-print" role="navigation" aria-label="Menu principal">
+      <nav>
+        <ul class="nav-list" role="menubar">
+          <li role="none">
+            <a href="#dashboard" class="nav-item active" data-view="dashboard" role="menuitem" aria-current="page">
+              <i data-lucide="bar-chart-3" aria-hidden="true"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li role="none">
+            <a href="#cadastro" class="nav-item" data-view="cadastro" role="menuitem">
+              <i data-lucide="file-plus" aria-hidden="true"></i>
+              <span>Cadastro</span>
+            </a>
+          </li>
+          <li role="none" class="dev-only">
+            <a href="#aprovacao" class="nav-item" data-view="aprovacao" role="menuitem">
+              <i data-lucide="check-circle" aria-hidden="true"></i>
+              <span>Fila de Aprovação</span>
+              <span id="pending-badge" class="nav-badge" aria-label="Itens pendentes">0</span>
+            </a>
+          </li>
+          <li role="none" class="dev-only">
+            <a href="#config" class="nav-item" data-view="config" role="menuitem">
+              <i data-lucide="settings" aria-hidden="true"></i>
+              <span>Configurações</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Sobreposição para fechar sidebar no mobile -->
+    <div id="sidebar-overlay" class="sidebar-overlay no-print" hidden></div>
+
+    <!-- Conteúdo Principal -->
+    <main id="main-content" role="main">
+
+      <!-- ==================== DASHBOARD ==================== -->
+      <section id="view-dashboard" class="view" aria-label="Painel de indicadores">
+
+        <!-- CABEÇALHO OFICIAL DO RELATÓRIO (LOGO À ESQUERDA + BLOCO DE TEXTO ALINHADO À DIREITA) -->
+        <div id="report-header-banner" class="report-header-banner" aria-label="Cabeçalho do Relatório Prova de Piloto">
+          <div class="report-header-logo-container">
+            <img
+              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAE0UlEQVR4AexXa2wUVRT+9tmHbaW1rBVpNBYkMWL4IRFKiMYHKiWg9QeYEC1gMRIjpqGi9fFDSlNBEwNRotsGURMbo6SNwQRrIEYrGI0xGPxVCSZIYCkUaNmm3V2W+w3sZHd22M5tZ+8uzdzkzNx75p7Hd869595xr0cgPpXJjSneHIA3eoKdDDoZzPMIOEs0zxM0rntOBscNUZ5PcDKY5wka1z1bMxjFeVxCSKcR0UeOm20ACW5e4zq0HDqs0yv7ezGGUE4h2gbwMsZQeecduGfBAzrdv+RRxHIKD7ANoBmOWDRqxlbKkwYYQ1jkKqQTl+ZkPU7WSX1x2BcYKYAxAa6mvg61zZt1mif23UT2GUGwCLEoBRbN1/XNqn9aLOthrVARuDF4lDPyMo2lAI5hGA++8Dwat7Xr9NzWdzGSyYLJNwYkgnNo+KoLn168iLZfDuj63vi2C53xUa1QVT1UqwGlCgIjlc69S1s95FkhKYBUGB2L8KVTZHRU71vpMGt3169ERySCh1etRHFpqakYi1Xrwf1Y3bkbFxDSsrqmZw/qWjZp2WaQTAUNTGmABnmpIZ26b3UDmCWP12tJ9om1DdjY8x08KIGvsBCDJ0+houo2S7KcpAwgl1dh+Uxs+mI37aZReGgIF84MpPHJWLh8GeY3N+LQN3vhLfDj510d8KGCn8YlZQDDYs+t60oHN3Dif2ypewoNZWVoDEzHi65b8ccPP6Y5vratFX3BXeh+eQPC/SfhgrUVoARgHFEUi4jz4E/2nFlrqp6JY9/3oBwBjTh32+OPpYHkkn5EVG/KuyyC41wlAGMYRvXSxbSXQj07PxZ7C/AjoPNd8GKaCEbnqjUwtjmLakWxMXIzj5UApAteUSD4TqajvQcEwJJkltYnyLODJ8AMa4xrD59L3l15iWvGbpRXXgLkPpwx697rnpEywVUC0AU/hk6HtMLBCkn65/BvGDl7Dm7xzehwWFTc5VveMrInNHZPSEpSyCNqaKjvd+wQ1TFB7QsXYOjvY+B+S1Y3ghDmLF2h3XKS+RPtKwFI55gpj+gkU0RkircbEoENIoTF4ih4e1+3VmBiNvxuKQEYF+cgL8nLPvgQS7a2mxIv3sHQGe3SLeKA1idXoHvHR+xOipQA5DlYObsGzzRtxLMtm02JF++bp1dqYHhl6+87iPIZVdp4Mg8lAGUdDDY1i+IDlFXcIiuaNj/vAAZfex1HvvxM3GeA4rLSNIdlGdIAvX5fig1fQUHKOGkg1eWx8ersufh1+3soQkDsWuD2mpoUHfxdSmFYGLgtzNGn+FGCnzr2gFFO0OdvviMcQsbmEXKnjxxNkUvI71y/AS9VVKNNHBvD/cfhx9V7aZHQ+PX291Nkej/pgF/ogkSTAsjz7N+9+7QoM9Kkv4KdwuhVp65n1yUWHH9xON9If4pfoNhgGDchIO6lxUg0AjXOpW36kJhj5S0FkAppgMYT5MU0WGkEmZAxvvnNTIdxHm2bzcvEkwaYSZnxG//hjDzVY9sA8qYycPw/sFjwrpkgj2pEBnu2AeRS5X7kHTNx3+Sby8xgU+nQNoD0miCLRLFIJvJzSe5cGldh2wGoIsrZtOFkMJvRVaHbyaCKKGfThpPBbEZXhW4ngyqirNnI0mPKZ/AKAAAA//8m7uk5AAAABklEQVQDAEbV7Ggy/c7eAAAAAElFTkSuQmCC"
+              alt="Logotipo LLA"
+              class="report-header-logo"
+            >
+          </div>
+          <div class="report-header-text">
+            <h1 class="report-header-title">PROVA DE PILOTO - LLA</h1>
+            <div class="report-header-meta">
+              <span id="print-periodo" class="meta-item"><i data-lucide="calendar" class="meta-icon"></i> <strong>Período:</strong> —</span>
+              <span id="print-segmentos" class="meta-item"><i data-lucide="tag" class="meta-icon"></i> <strong>Segmentos:</strong> Todos</span>
+              <span id="print-criterio" class="meta-item"><i data-lucide="check-circle" class="meta-icon"></i> <strong>Critério:</strong> somente OPs com PROVA finalizada</span>
+              <span id="print-date-time" class="meta-item"><i data-lucide="clock" class="meta-icon"></i> <strong>Data/Hora:</strong> —</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de Filtros -->
+        <div id="dashboard-filters" class="filters-bar no-print" aria-label="Filtros do painel">
+          <div class="filters-row">
+            <div class="filter-group">
+              <label for="filter-data-inicio">Data Inicial</label>
+              <input type="date" id="filter-data-inicio" name="filter-data-inicio">
+            </div>
+            <div class="filter-group">
+              <label for="filter-data-fim">Data Final</label>
+              <input type="date" id="filter-data-fim" name="filter-data-fim">
+            </div>
+            <div class="filter-group">
+              <label for="filter-segmento">Segmento</label>
+              <select id="filter-segmento" name="filter-segmento">
+                <option value="Todos">Todos</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-etapa">Etapa</label>
+              <select id="filter-etapa" name="filter-etapa">
+                <option value="Todas">Todas</option>
+                <option value="Somente Piloto">Somente Piloto</option>
+                <option value="Somente Repilotagem">Somente Repilotagem</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-servico">Serviço</label>
+              <select id="filter-servico" name="filter-servico">
+                <option value="Todos">Todos</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-modelista">Modelista</label>
+              <select id="filter-modelista" name="filter-modelista">
+                <option value="Todos">Todos</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-pilotista">Pilotista</label>
+              <select id="filter-pilotista" name="filter-pilotista">
+                <option value="Todos">Todas as Pilotistas</option>
+              </select>
+            </div>
+            <div class="filter-group filter-actions-group">
+              <label class="sr-only">Ações</label>
+              <div class="filters-actions">
+                <button type="button" id="btn-aplicar-filtros" class="btn btn-primary" title="Aplicar filtros selecionados">
+                  <i data-lucide="filter" aria-hidden="true"></i>
+                  <span>Aplicar</span>
+                </button>
+                <button type="button" id="btn-limpar-filtros" class="btn btn-outline" title="Limpar todos os filtros">
+                  <i data-lucide="rotate-ccw" aria-hidden="true"></i>
+                  <span>Limpar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controles de Impressão -->
+        <div class="print-controls no-print">
+          <label class="toggle-label" for="toggle-obs-print">
+            <input type="checkbox" id="toggle-obs-print" name="toggle-obs-print">
+            <span>Incluir Observações Detalhadas das OPs no Relatório Impresso</span>
+          </label>
+          <button type="button" id="btn-imprimir" class="btn btn-outline">
+            <i data-lucide="printer" aria-hidden="true"></i>
+            Imprimir Relatório
+          </button>
+        </div>
+
+        <!-- Cartões de KPI com Metas Configuráveis (Grid Horizontal Lado a Lado) -->
+        <div id="kpi-cards" class="kpi-grid-container" aria-label="Indicadores chave de desempenho">
+          <!-- 1. Total: ponto de partida -->
+          <article id="kpi-total" class="kpi-card kpi-blue-dark">
+            <span class="kpi-label">TOTAL DE OPS</span>
+            <span class="kpi-value">0</span>
+            <span class="kpi-subtext">Total no período</span>
+          </article>
+          <!-- 2. Piloto: quantas entraram como piloto inicial -->
+          <article id="kpi-piloto" class="kpi-card kpi-blue">
+            <span class="kpi-label">PILOTO INICIAL</span>
+            <span class="kpi-value">0</span>
+            <span class="kpi-meta-badge info" id="meta-piloto-badge">0.0% do total</span>
+          </article>
+          <!-- 3. Aprovadas: resultado positivo final -->
+          <article id="kpi-aprovadas" class="kpi-card kpi-green">
+            <span class="kpi-label">APROVADAS</span>
+            <span class="kpi-value">0</span>
+            <div class="kpi-meta-row">
+              <span class="kpi-pct" id="kpi-aprovada-pct">0.0%</span>
+              <span class="kpi-meta-badge" id="meta-aprovada-badge">Meta: ≥ 80%</span>
+            </div>
+          </article>
+          <!-- 4. Em Repilotagem: OPs ainda aguardando resolução -->
+          <article id="kpi-em-repilotagem" class="kpi-card kpi-yellow">
+            <span class="kpi-label">EM REPILOTAGEM</span>
+            <span class="kpi-value">0</span>
+            <span class="kpi-subtext" id="kpi-em-repilotagem-pct">0.0% do total</span>
+          </article>
+          <!-- 5. Repilotagens: quantas precisaram de mais de uma prova -->
+          <article id="kpi-repilotagens" class="kpi-card kpi-orange">
+            <span class="kpi-label">REPILOTAGENS</span>
+            <span class="kpi-value">0</span>
+            <div class="kpi-meta-row">
+              <span class="kpi-pct" id="kpi-repilotagem-pct">0.0%</span>
+              <span class="kpi-meta-badge" id="meta-repilotagem-badge">Meta: ≤ 15%</span>
+            </div>
+          </article>
+          <!-- 6. Reprovadas: descartadas -->
+          <article id="kpi-reprovadas" class="kpi-card kpi-red">
+            <span class="kpi-label">REPROVADAS</span>
+            <span class="kpi-value">0</span>
+            <div class="kpi-meta-row">
+              <span class="kpi-pct" id="kpi-reprovada-pct">0.0%</span>
+              <span class="kpi-meta-badge" id="meta-reprovada-badge">Meta: ≤ 5%</span>
+            </div>
+          </article>
+          <!-- 7. Standby: pausadas -->
+          <article id="kpi-standby" class="kpi-card kpi-gray">
+            <span class="kpi-label">STANDBY</span>
+            <span class="kpi-value">0</span>
+            <span class="kpi-subtext" id="kpi-standby-pct">0.0% do total</span>
+          </article>
+        </div>
+
+        <!-- Resumo por Segmento -->
+        <section class="dashboard-section" id="sec-resumo-segmento" aria-label="Resumo por segmento">
+          <h2 class="section-title">Resumo por Segmento</h2>
+          <div class="table-responsive">
+            <table id="tabela-resumo-segmento" class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">Segmento</th>
+                  <th scope="col">Total OP</th>
+                  <th scope="col">Piloto</th>
+                  <th scope="col">Aprovadas</th>
+                  <th scope="col">% Aprovadas</th>
+                  <th scope="col">Em Repilotagem</th>
+                  <th scope="col">% Em Rep.</th>
+                  <th scope="col">Repilotagem</th>
+                  <th scope="col">% Repilotagem</th>
+                  <th scope="col">Reprovadas</th>
+                  <th scope="col">% Reprovadas</th>
+                  <th scope="col">Standby</th>
+                  <th scope="col">% Standby</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <th scope="row">TOTAL</th>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>0%</td>
+                  <td>0</td>
+                  <td>0%</td>
+                  <td>0</td>
+                  <td>0%</td>
+                  <td>0</td>
+                  <td>0%</td>
+                  <td>0</td>
+                  <td>0%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+
+        <!-- Pareto: Repilotagem -->
+        <section class="dashboard-section pareto-section" aria-label="Motivos de repilotagem">
+          <h2 class="section-title">Top 8 Motivos de Repilotagem</h2>
+          <div class="chart-container">
+            <canvas id="chart-pareto-repilotagem" aria-label="Gráfico de Pareto dos motivos de repilotagem" role="img"></canvas>
+          </div>
+          <div class="table-responsive">
+            <table id="tabela-pareto-repilotagem" class="data-table pareto-table">
+              <thead>
+                <tr>
+                  <th scope="col">Motivo</th>
+                  <th scope="col" style="width: 140px; text-align: right;">Quantidade de peças</th>
+                  <th scope="col" style="width: 100px; text-align: right;">% do Total</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Pareto: Reprovação -->
+        <section class="dashboard-section pareto-section" aria-label="Motivos de reprovação">
+          <h2 class="section-title">Top 8 Motivos de Reprovação</h2>
+          <div class="chart-container">
+            <canvas id="chart-pareto-reprovacao" aria-label="Gráfico de Pareto dos motivos de reprovação" role="img"></canvas>
+          </div>
+          <div class="table-responsive">
+            <table id="tabela-pareto-reprovacao" class="data-table pareto-table">
+              <thead>
+                <tr>
+                  <th scope="col">Motivo</th>
+                  <th scope="col" style="width: 140px; text-align: right;">Quantidade de peças</th>
+                  <th scope="col" style="width: 100px; text-align: right;">% do Total</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Pareto: Aprovação com Ajustes -->
+        <section class="dashboard-section pareto-section" aria-label="Motivos de aprovação com ajustes">
+          <h2 class="section-title">Top 8 Motivos de Aprovação com Ajustes</h2>
+          <div class="chart-container">
+            <canvas id="chart-pareto-aprovacao-ajustes" aria-label="Gráfico de Pareto dos motivos de aprovação com ajustes" role="img"></canvas>
+          </div>
+          <div class="table-responsive">
+            <table id="tabela-pareto-aprovacao-ajustes" class="data-table pareto-table">
+              <thead>
+                <tr>
+                  <th scope="col">Motivo</th>
+                  <th scope="col" style="width: 140px; text-align: right;">Quantidade de peças</th>
+                  <th scope="col" style="width: 100px; text-align: right;">% do Total</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Desempenho por Modelista -->
+        <section class="dashboard-section" aria-label="Desempenho por modelista">
+          <div class="section-title-bar">
+            <h2 class="section-title">Desempenho por Modelista</h2>
+            <div class="chart-toggle no-print">
+              <label for="toggle-modelista-chart" class="toggle-label">
+                <span>Agrupadas</span>
+                <input type="checkbox" id="toggle-modelista-chart" name="toggle-modelista-chart" role="switch" aria-label="Alternar entre gráfico agrupado e empilhado">
+                <span>Empilhadas</span>
+              </label>
+            </div>
+          </div>
+          <div class="chart-container chart-container-wide">
+            <canvas id="chart-modelista" aria-label="Gráfico de desempenho por modelista" role="img"></canvas>
+          </div>
+        </section>
+
+        <!-- Desempenho por Pilotista -->
+        <section class="dashboard-section" aria-label="Desempenho por pilotista">
+          <div class="section-title-bar">
+            <h2 class="section-title">Desempenho por Pilotista</h2>
+            <div class="chart-toggle no-print">
+              <label for="toggle-pilotista-chart" class="toggle-label">
+                <span>Agrupadas</span>
+                <input type="checkbox" id="toggle-pilotista-chart" name="toggle-pilotista-chart" role="switch" aria-label="Alternar entre gráfico agrupado e empilhado">
+                <span>Empilhadas</span>
+              </label>
+            </div>
+          </div>
+          <div class="chart-container chart-container-wide">
+            <canvas id="chart-pilotista" aria-label="Gráfico de desempenho por pilotista" role="img"></canvas>
+          </div>
+        </section>
+
+        <!-- Análise de Eficiência em Repilotagens -->
+        <section class="dashboard-section" aria-label="Análise de eficiência em repilotagens">
+          <div class="section-title-bar">
+            <h2 class="section-title">Análise de Eficiência em Repilotagens</h2>
+            <div class="section-actions no-print" style="display:flex; align-items:center; gap:0.5rem;">
+              <label for="filter-repilotagem-tipo" class="inline-filter-label">Filtrar por:</label>
+              <select id="filter-repilotagem-tipo" class="filter-select-sm">
+                <option value="Todos">Todos</option>
+                <option value="Modelista">Modelista</option>
+                <option value="Pilotista">Pilotista</option>
+              </select>
+              <select id="filter-repilotagem-pessoa" class="filter-select-sm" style="display:none;">
+                <option value="Todos">Todos(as)</option>
+              </select>
+            </div>
+          </div>
+          <div class="efficiency-row">
+            <article class="efficiency-card" aria-label="Taxa de conversão de repilotagens">
+              <span class="efficiency-label">Taxa de Conversão de Repilotagens</span>
+              <span id="taxa-conversao" class="efficiency-value">0%</span>
+              <span class="efficiency-subtext" id="repilotagem-conversao-subtext">0 de 0 repilotagens aprovadas</span>
+            </article>
+            <div class="chart-container chart-container-donut">
+              <canvas id="chart-repilotagem-rosca" aria-label="Gráfico de rosca da eficiência em repilotagens" role="img"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- Painel de Análise Detalhada de Observações e Motivos -->
+        <section class="dashboard-section" id="section-observacoes" aria-label="Análise de Observações e Motivos">
+          <div class="section-title-bar">
+            <h2 class="section-title">Análise Detalhada de Observações e Frequência de Motivos</h2>
+            <div class="obs-summary-badge" id="obs-summary-badge">0 registros</div>
+          </div>
+          <div class="obs-toolbar no-print">
+            <div class="obs-filter-group">
+              <label for="filter-obs-motivo">Filtrar por Motivo:</label>
+              <select id="filter-obs-motivo" class="filter-select">
+                <option value="Todos">Todos os Motivos</option>
+              </select>
+            </div>
+            <div class="obs-filter-group">
+              <label for="filter-obs-ordem">Ordenar por:</label>
+              <select id="filter-obs-ordem" class="filter-select">
+                <option value="freq_desc">Maior Frequência de Motivos (Padrões repetitivos)</option>
+                <option value="freq_asc">Menor Frequência de Motivos</option>
+                <option value="data_desc">Data Mais Recente</option>
+                <option value="data_asc">Data Mais Antiga</option>
+                <option value="op">Número da OP</option>
+              </select>
+            </div>
+            <div class="obs-filter-group search-group">
+              <label for="filter-obs-busca">Buscar Texto:</label>
+              <div class="search-input-wrapper">
+                <input type="text" id="filter-obs-busca" placeholder="Buscar texto na observação, OP, ref...">
+              </div>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="tabela-analise-observacoes" class="data-table obs-table">
+              <thead>
+                <tr>
+                  <th scope="col" style="width:75px;">OP</th>
+                  <th scope="col" style="width:85px;">Ref</th>
+                  <th scope="col" style="width:95px;">Segmento</th>
+                  <th scope="col" style="width:115px;">Etapa</th>
+                  <th scope="col" style="width:115px;">Modelista</th>
+                  <th scope="col" style="width:115px;">Pilotista</th>
+                  <th scope="col" style="width:115px;">Situação</th>
+                  <th scope="col" style="width:230px;">Motivo(s) Registrado(s)</th>
+                  <th scope="col">Texto da Observação da OP</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Rodapé de Impressão -->
+        <div id="print-timestamp" class="print-only" aria-hidden="true">
+          <p>Gerado em <span id="print-generated-datetime"></span></p>
+        </div>
+
+        <!-- Anexo de Observações (impressão) -->
+        <section id="print-obs-annex" class="print-obs-annex" hidden aria-label="Anexo de observações detalhadas">
+          <h2 class="section-title">Anexo — Observações Detalhadas das OPs</h2>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">OP</th>
+                  <th scope="col">Referência</th>
+                  <th scope="col">Segmento</th>
+                  <th scope="col">Etapa</th>
+                  <th scope="col">Situação</th>
+                  <th scope="col">Motivo(s)</th>
+                  <th scope="col">Observações</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+      </section>
+
+      <!-- ==================== CADASTRO DE OP ==================== -->
+      <section id="view-cadastro" class="view" hidden aria-label="Cadastro de ordem de produção">
+        <h2 class="view-title">Cadastro de OP</h2>
+        <form id="form-cadastro" class="form-cadastro" aria-label="Formulário de cadastro de OP" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cad-data">Data da Prova <span class="required">*</span></label>
+              <input type="date" id="cad-data" name="cad-data" required>
+            </div>
+            <div class="form-group">
+              <label for="cad-hora">Hora <span class="required">*</span></label>
+              <input type="time" id="cad-hora" name="cad-hora" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cad-usuario">Usuário</label>
+              <input type="text" id="cad-usuario" name="cad-usuario" disabled>
+            </div>
+            <div class="form-group">
+              <label for="cad-op">OP <span class="required">*</span></label>
+              <input type="text" id="cad-op" name="cad-op" required placeholder="Número da OP (ex: 8888)">
+              <small id="cad-op-helper" class="input-helper-text" aria-live="polite"></small>
+            </div>
+            <div class="form-group">
+              <label for="cad-referencia">Referência <span class="required">*</span></label>
+              <input type="text" id="cad-referencia" name="cad-referencia" required placeholder="Referência (ex: B936)">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cad-segmento">Segmento <span class="required">*</span></label>
+              <input type="text" id="cad-segmento" name="cad-segmento" list="dl-segmento" required placeholder="Selecione ou digite">
+              <datalist id="dl-segmento"></datalist>
+            </div>
+            <div class="form-group">
+              <label for="cad-etapa">Etapa <span class="required">*</span></label>
+              <select id="cad-etapa" name="cad-etapa" required>
+                <option value="" disabled selected>Selecione a etapa</option>
+                <option value="PILOTO">PILOTO</option>
+                <option value="1° REPILOTAGEM">1° REPILOTAGEM</option>
+                <option value="2° REPILOTAGEM">2° REPILOTAGEM</option>
+                <option value="3° REPILOTAGEM">3° REPILOTAGEM</option>
+              </select>
+            </div>
+            <div class="form-group" id="group-cad-servico" style="display:none;">
+              <label for="cad-servico">Serviço <span class="required">*</span></label>
+              <input type="text" id="cad-servico" name="cad-servico" list="dl-servico" placeholder="Selecione ou digite">
+              <datalist id="dl-servico"></datalist>
+            </div>
+          </div>
+          <div class="form-row three-cols">
+            <div class="form-group" id="group-cad-modelista">
+              <label for="cad-modelista">Modelista <span class="required">*</span></label>
+              <input type="text" id="cad-modelista" name="cad-modelista" list="dl-modelista" required placeholder="Selecione ou digite o nome">
+              <datalist id="dl-modelista"></datalist>
+            </div>
+            <div class="form-group" id="group-cad-pilotista">
+              <label for="cad-pilotista">Pilotista <span class="required">*</span></label>
+              <input type="text" id="cad-pilotista" name="cad-pilotista" list="dl-pilotista" required placeholder="Selecione ou digite o nome">
+              <datalist id="dl-pilotista"></datalist>
+            </div>
+            <div class="form-group" id="group-cad-situacao">
+              <label for="cad-situacao">Situação <span class="required">*</span></label>
+              <input type="text" id="cad-situacao" name="cad-situacao" list="dl-situacao" required placeholder="Selecione ou digite">
+              <datalist id="dl-situacao"></datalist>
+            </div>
+          </div>
+
+          <!-- Seção de Motivos com Tags Dinâmicas -->
+          <fieldset class="form-fieldset">
+            <legend>Motivo(s) da Prova / Repilotagem</legend>
+            <div class="motivo-input-row">
+              <div class="form-group form-group-grow">
+                <input type="text" id="cad-motivo-input" name="cad-motivo-input" list="dl-motivo" placeholder="Selecione ou digite um motivo e clique em adicionar">
+                <datalist id="dl-motivo"></datalist>
+              </div>
+              <button type="button" id="btn-add-motivo" class="btn btn-primary btn-sm">
+                <i data-lucide="plus" aria-hidden="true"></i>
+                Adicionar Motivo
+              </button>
+            </div>
+            <div id="motivos-tags" class="tags-container" role="list" aria-label="Motivos adicionados"></div>
+          </fieldset>
+
+          <div class="form-row">
+            <div class="form-group form-group-full">
+              <label for="cad-observacao">Observações da OP</label>
+              <textarea id="cad-observacao" name="cad-observacao" rows="4" placeholder="Descreva os ajustes detalhados, observações de estilo, medidas ou justificativas"></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" id="btn-salvar-op" class="btn btn-success">
+              <i data-lucide="save" aria-hidden="true"></i>
+              Salvar OP
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ==================== FILA DE APROVAÇÃO ==================== -->
+      <section id="view-aprovacao" class="view dev-only" hidden aria-label="Fila de aprovação de ordens de produção">
+        <div class="view-header-row">
+          <h2 class="view-title">
+            Fila de Aprovação
+            <span class="title-badge" aria-label="Quantidade pendente" id="aprovacao-count-badge">0</span>
+          </h2>
+        </div>
+        <div class="aprovacao-toolbar no-print">
+          <div class="search-bar">
+            <label for="busca-aprovacao" class="sr-only">Buscar na fila de aprovação</label>
+            <i data-lucide="search" class="search-icon" aria-hidden="true"></i>
+            <input type="text" id="busca-aprovacao" name="busca-aprovacao" placeholder="Buscar por OP, Referência ou Modelista...">
+          </div>
+          <div class="batch-actions">
+            <label class="checkbox-label" for="select-all-aprovacao">
+              <input type="checkbox" id="select-all-aprovacao" name="select-all-aprovacao">
+              <span>Selecionar todos</span>
+            </label>
+            <button type="button" id="btn-aprovar-selecionadas" class="btn btn-success btn-sm">
+              <i data-lucide="check" aria-hidden="true"></i>
+              Aprovar Selecionadas
+            </button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table id="tabela-aprovacao" class="data-table aprovacao-table">
+            <thead>
+              <tr>
+                <th scope="col" class="col-check">
+                  <span class="sr-only">Seleção</span>
+                </th>
+                <th scope="col">Data</th>
+                <th scope="col">Hora</th>
+                <th scope="col">Usuário</th>
+                <th scope="col">OP</th>
+                <th scope="col">Ref</th>
+                <th scope="col">Segmento</th>
+                <th scope="col">Etapa</th>
+                <th scope="col">Serviço</th>
+                <th scope="col">Modelista</th>
+                <th scope="col">Pilotista</th>
+                <th scope="col">Situação</th>
+                <th scope="col">Motivo(s)</th>
+                <th scope="col">Obs</th>
+                <th scope="col">Ações</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ==================== CONFIGURAÇÕES ==================== -->
+      <section id="view-config" class="view dev-only" hidden aria-label="Configurações de indicadores">
+        <h2 class="view-title">Configurações de Indicadores e Metas</h2>
+
+        <!-- Painel de Gerenciamento de Metas dos Indicadores (Admin) -->
+        <div class="config-card metas-config-card" aria-label="Gerenciamento de Metas">
+          <div class="card-header-with-icon">
+            <i data-lucide="target" class="card-header-icon" aria-hidden="true"></i>
+            <div>
+              <h3>Metas Estratégicas dos Indicadores</h3>
+              <p class="card-subtitle">Defina as metas percentuais esperadas para cálculo de eficiência e alertas visuais nos KPIs</p>
+            </div>
+          </div>
+          <form id="form-config-metas" class="metas-form">
+            <div class="form-row three-cols">
+              <div class="form-group">
+                <label for="meta-input-aprovada">Meta Mínima de Aprovação (%)</label>
+                <div class="input-with-suffix">
+                  <input type="number" id="meta-input-aprovada" min="1" max="100" step="0.5" value="80" required>
+                  <span class="suffix">%</span>
+                </div>
+                <small class="helper-text">Padrão: 80% (Verde quando atingido ou superado)</small>
+              </div>
+              <div class="form-group">
+                <label for="meta-input-repilotagem">Meta Máxima de Repilotagem (%)</label>
+                <div class="input-with-suffix">
+                  <input type="number" id="meta-input-repilotagem" min="0" max="100" step="0.5" value="15" required>
+                  <span class="suffix">%</span>
+                </div>
+                <small class="helper-text">Padrão: 15% (Vermelho quando ultrapassar)</small>
+              </div>
+              <div class="form-group">
+                <label for="meta-input-reprovada">Meta Máxima de Reprovação (%)</label>
+                <div class="input-with-suffix">
+                  <input type="number" id="meta-input-reprovada" min="0" max="100" step="0.5" value="5" required>
+                  <span class="suffix">%</span>
+                </div>
+                <small class="helper-text">Padrão: 5% (Vermelho quando ultrapassar)</small>
+              </div>
+            </div>
+            <div class="form-actions-right">
+              <button type="submit" id="btn-salvar-metas" class="btn btn-primary">
+                <i data-lucide="check" aria-hidden="true"></i>
+                Salvar Metas
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Abas de Categoria de Termos -->
+        <h3 class="config-subheading">Termos Customizados do Sistema</h3>
+        <div class="config-tabs no-print" role="tablist" aria-label="Filtrar por categoria">
+          <button type="button" class="tab-btn active" role="tab" aria-selected="true" data-category="TODOS">Todos</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-category="SITUACAO">Situação</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-category="MOTIVO">Motivo</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-category="SEGMENTO">Segmento</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-category="MODELISTA">Modelista</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-category="PILOTISTA">Pilotista</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-category="SERVICO">Serviço</button>
+          <button type="button" class="tab-btn" role="tab" aria-selected="false" data-category="ETAPA">Etapa</button>
+        </div>
+
+        <!-- Formulário para Adicionar Termo -->
+        <div class="config-add-form no-print" aria-label="Adicionar novo termo">
+          <h3>Adicionar Novo Termo</h3>
+          <div class="form-row">
+            <div class="form-group form-group-grow">
+              <label for="config-novo-termo">Termo</label>
+              <input type="text" id="config-novo-termo" name="config-novo-termo" required placeholder="Digite o novo termo">
+            </div>
+            <div class="form-group">
+              <label for="config-categoria">Categoria</label>
+              <select id="config-categoria" name="config-categoria" required>
+                <option value="" disabled selected>Selecione</option>
+                <option value="SITUACAO">Situação</option>
+                <option value="MOTIVO">Motivo</option>
+                <option value="SEGMENTO">Segmento</option>
+                <option value="MODELISTA">Modelista</option>
+                <option value="PILOTISTA">Pilotista</option>
+                <option value="SERVICO">Serviço</option>
+                <option value="ETAPA">Etapa</option>
+              </select>
+            </div>
+            <div class="form-group form-group-btn">
+              <button type="button" id="btn-adicionar-termo" class="btn btn-primary">
+                <i data-lucide="plus-circle" aria-hidden="true"></i>
+                Adicionar Termo
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela de Indicadores -->
+        <div class="table-responsive">
+          <table id="tabela-indicadores" class="data-table config-table">
+            <thead>
+              <tr>
+                <th scope="col">Termo</th>
+                <th scope="col">Categoria</th>
+                <th scope="col">Exibir nos Gráficos</th>
+                <th scope="col">Cadastrado por</th>
+                <th scope="col">Data</th>
+                <th scope="col">Ações</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ==================== TOAST CONTAINER ==================== -->
+  <div id="toast-container" class="toast-container no-print" role="status" aria-live="polite" aria-label="Notificações do sistema"></div>
+
+  <!-- ==================== MODAL: REJEITAR OP ==================== -->
+  <div id="modal-rejeitar" class="modal-overlay no-print" hidden role="dialog" aria-modal="true" aria-labelledby="modal-rejeitar-titulo">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 id="modal-rejeitar-titulo">Rejeitar OP</h3>
+        <button type="button" class="btn-icon modal-close" aria-label="Fechar modal" data-dismiss="modal-rejeitar">
+          <i data-lucide="x" aria-hidden="true"></i>
+        </button>
+      </header>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="rejeitar-motivo">Motivo da rejeição</label>
+          <textarea id="rejeitar-motivo" name="rejeitar-motivo" rows="4" required placeholder="Descreva o motivo da rejeição desta OP"></textarea>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-outline" data-dismiss="modal-rejeitar">Cancelar</button>
+        <button type="button" id="btn-confirmar-rejeicao" class="btn btn-danger">Confirmar Rejeição</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: NOVO TERMO ==================== -->
+  <div id="modal-novo-termo" class="modal-overlay no-print" hidden role="dialog" aria-modal="true" aria-labelledby="modal-novo-termo-titulo">
+    <div class="modal-card">
+      <header class="modal-header">
+        <h3 id="modal-novo-termo-titulo">Novo Termo Detectado</h3>
+        <button type="button" class="btn-icon modal-close" aria-label="Fechar modal" data-dismiss="modal-novo-termo">
+          <i data-lucide="x" aria-hidden="true"></i>
+        </button>
+      </header>
+      <div class="modal-body">
+        <p>Os seguintes termos não estão cadastrados nos indicadores. Deseja adicioná-los à lista de Configurações de Indicadores?</p>
+        <ul id="modal-termos-lista" class="termos-lista"></ul>
+      </div>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-outline" data-dismiss="modal-novo-termo">Ignorar</button>
+        <button type="button" id="btn-confirmar-novo-termo" class="btn btn-primary">Adicionar aos Indicadores</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ==================== LOADING OVERLAY ==================== -->
+  <div id="loading-overlay" class="loading-overlay no-print" hidden role="status" aria-label="Carregando">
+    <div class="loading-spinner">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Carregando dados...</p>
+    </div>
+  </div>
+
+</body>
+</html>
