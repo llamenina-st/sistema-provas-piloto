@@ -884,6 +884,128 @@ function populateDatalists(indicadores) {
   });
 
   populateFilterSelects(indicadores);
+  
+  // FIX: Melhorar suporte mobile para datalists
+  enhanceMobileDatalistSupport(mapCategoryToDatalist, indicadores);
+}
+
+// Função auxiliar para melhorar suporte a datalist no mobile
+function enhanceMobileDatalistSupport(mapCategoryToDatalist, indicadores) {
+  // Detecta se está em mobile
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  if (!isMobile) return; // Desktop funciona bem com datalist nativo
+  
+  // Para cada campo com datalist, adiciona eventos adicionais
+  Object.entries(mapCategoryToDatalist).forEach(([categoria, datalistId]) => {
+    const inputId = datalistId.replace('dl-', 'cad-');
+    const input = document.getElementById(inputId);
+    
+    if (!input) return;
+    
+    // Armazena os valores válidos no elemento para acesso rápido
+    const validValues = indicadores
+      .filter(ind => ind.categoria === categoria)
+      .map(ind => ind.termo_customizado);
+    
+    input.dataset.validValues = JSON.stringify(validValues);
+    
+    // Cria um wrapper para o dropdown customizado
+    if (!input.parentElement.classList.contains('custom-datalist-wrapper')) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'custom-datalist-wrapper';
+      input.parentNode.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
+      
+      const dropdown = document.createElement('div');
+      dropdown.className = 'custom-datalist-dropdown';
+      dropdown.style.display = 'none';
+      wrapper.appendChild(dropdown);
+    }
+    
+    const wrapper = input.parentElement;
+    const dropdown = wrapper.querySelector('.custom-datalist-dropdown');
+    
+    // Função para mostrar dropdown
+    const showDropdown = () => {
+      const validValues = JSON.parse(input.dataset.validValues || '[]');
+      const filterValue = input.value.toLowerCase();
+      
+      // Filtra valores baseado no que foi digitado
+      const filtered = validValues.filter(v => 
+        v.toLowerCase().includes(filterValue)
+      );
+      
+      if (filtered.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+      
+      dropdown.innerHTML = '';
+      filtered.forEach(value => {
+        const option = document.createElement('div');
+        option.className = 'custom-datalist-option';
+        option.textContent = value;
+        option.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          input.value = value;
+          dropdown.style.display = 'none';
+          input.blur();
+          
+          // Dispara evento de input para validações
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        dropdown.appendChild(option);
+      });
+      
+      dropdown.style.display = 'block';
+    };
+    
+    // Função para esconder dropdown
+    const hideDropdown = () => {
+      setTimeout(() => {
+        dropdown.style.display = 'none';
+      }, 200);
+    };
+    
+    // Eventos do input
+    input.addEventListener('focus', showDropdown);
+    input.addEventListener('input', showDropdown);
+    input.addEventListener('blur', hideDropdown);
+    
+    // Previne scroll quando dropdown está aberto
+    input.addEventListener('touchstart', (e) => {
+      if (dropdown.style.display === 'block') {
+        e.preventDefault();
+      }
+    }, { passive: false });
+    
+    // Validação ao sair do campo
+    input.addEventListener('blur', function() {
+      const validValues = JSON.parse(this.dataset.validValues || '[]');
+      const val = this.value;
+      
+      // Se o campo está vazio ou é um valor válido, OK
+      if (val === '' || validValues.includes(val)) {
+        this.setCustomValidity('');
+        return;
+      }
+      
+      // Permite novos cadastros (valores não na lista)
+      this.setCustomValidity('');
+    });
+  });
+  
+  // Fecha todos os dropdowns quando clicar fora
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.custom-datalist-wrapper')) {
+      document.querySelectorAll('.custom-datalist-dropdown').forEach(dd => {
+        dd.style.display = 'none';
+      });
+    }
+  });
 }
 
 function populateFilterSelects(indicadores) {
