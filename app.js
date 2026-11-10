@@ -962,8 +962,7 @@ function enhanceMobileDatalistSupport(mapCategoryToDatalist, indicadores) {
         option.className = 'custom-datalist-option';
         option.textContent = value;
         
-        // Usa mousedown e touchstart para capturar antes do blur
-        const selectOption = (e) => {
+        const doSelect = (e) => {
           e.preventDefault();
           e.stopPropagation();
           
@@ -974,21 +973,35 @@ function enhanceMobileDatalistSupport(mapCategoryToDatalist, indicadores) {
           if (inputId === 'cad-motivo-input') {
             const btnAddMotivo = document.getElementById('btn-add-motivo');
             if (btnAddMotivo) {
-              setTimeout(() => {
-                btnAddMotivo.click();
-              }, 50);
+              setTimeout(() => btnAddMotivo.click(), 50);
             }
           } else {
             input.blur();
           }
           
-          // Dispara evento de input para validações
           input.dispatchEvent(new Event('input', { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
         };
         
-        option.addEventListener('mousedown', selectOption);
-        option.addEventListener('touchstart', selectOption, { passive: false });
+        // Desktop: mousedown captura antes do blur
+        option.addEventListener('mousedown', doSelect);
+        
+        // Mobile: rastreia se houve scroll entre touchstart e touchend
+        // Se o dedo se moveu mais de 8px, é scroll — não seleciona
+        let touchStartY = 0;
+        let touchStartX = 0;
+        
+        option.addEventListener('touchstart', (e) => {
+          touchStartY = e.touches[0].clientY;
+          touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+        
+        option.addEventListener('touchend', (e) => {
+          const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+          const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
+          if (dy > 8 || dx > 8) return; // era scroll, ignora
+          doSelect(e);
+        }, { passive: false });
         
         dropdown.appendChild(option);
       });
@@ -1003,7 +1016,7 @@ function enhanceMobileDatalistSupport(mapCategoryToDatalist, indicadores) {
         if (!dropdown.matches(':hover')) {
           dropdown.style.display = 'none';
         }
-      }, 250);
+      }, 300);
     };
     
     // Eventos do input
