@@ -1906,398 +1906,197 @@ function renderParetoChart(canvasId, tableId, title, rawItems) {
 }
 
 // ETAPA 3: Gráfico de Desempenho por Modelista sem Lacunas Vazias (Barras Agrupadas Vizinhas)
-function renderModelistaChart(modelistas) {
-  const canvas = document.getElementById('chart-modelista');
+// Função utilitária compartilhada para gráficos de Modelista e Pilotista
+function renderDesempenhoChart({ canvasId, chartKey, stacked, pessoas, pessoaKey }) {
+  const canvas = document.getElementById(canvasId);
   if (!canvas || typeof Chart === 'undefined') return;
 
-  if (state.charts.modelista) {
-    state.charts.modelista.destroy();
+  if (state.charts[chartKey]) {
+    state.charts[chartKey].destroy();
+    state.charts[chartKey] = null;
   }
 
-  const stacked = state.modelistaStacked;
   const ctx = canvas.getContext('2d');
 
-  if (stacked) {
-    // Modo Empilhado: 1 coluna por modelista com fatias coloridas
-    const labels = modelistas.map(x => x.modelista);
-    const maxStacked = Math.max(...modelistas.map(m => m.aprovada + m.aprovada_ajustes + m.reprovada + m.repilotagem + m.standby), 0);
-    const suggestedMax = Math.ceil(maxStacked * 1.35) + 1;
+  const datasetsConfig = [
+    { key: 'aprovada',         label: 'Aprovada',            color: '#16A34A' },
+    { key: 'aprovada_ajustes', label: 'Aprovada c/ Ajustes', color: '#38BDF8' },
+    { key: 'reprovada',        label: 'Reprovada',           color: '#DC2626' },
+    { key: 'repilotagem',      label: 'Repilotagem',         color: '#D97706' },
+    { key: 'standby',          label: 'Standby',             color: '#94A3B8' }
+  ];
 
-    // Plugin inline para desenhar o total empilhado em cima de cada coluna
-    const stackedBarLabelsPlugin = {
-      id: 'modelistaStackedLabels',
-      afterDatasetsDraw(chart) {
-        const { ctx, scales } = chart;
-        const metaList = chart.data.datasets.map((d, i) => chart.getDatasetMeta(i));
-        if (!metaList.length) return;
+  // Labels categóricos — nome de cada pessoa
+  const labels = pessoas.map(x => x[pessoaKey]);
 
-        ctx.save();
-        ctx.font = 'bold 11px Arial, Helvetica, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillStyle = '#0f172a';
+  // Calcula totais por pessoa para o plugin de rótulos
+  const totaisPorPessoa = pessoas.map(p =>
+    datasetsConfig.reduce((s, c) => s + (p[c.key] || 0), 0)
+  );
 
-        labels.forEach((lab, idx) => {
-          const mod = modelistas[idx];
-          const total = (mod.aprovada || 0) + (mod.aprovada_ajustes || 0) + (mod.reprovada || 0) + (mod.repilotagem || 0) + (mod.standby || 0);
-          if (total > 0) {
-            // Achar o elemento do topo (último dataset com valor)
-            let topY = null;
-            let barX = null;
-            for (let d = metaList.length - 1; d >= 0; d--) {
-              const meta = metaList[d];
-              if (meta && meta.data[idx] && !meta.hidden) {
-                const el = meta.data[idx];
-                if (el.y !== undefined && chart.data.datasets[d].data[idx] > 0) {
-                  topY = el.y;
-                  barX = el.x;
-                  break;
-                }
-              }
+  // Plugin: desenha o valor em cima de cada barra (agrupado) ou total (empilhado)
+  const labelsPlugin = {
+    id: `${chartKey}Labels`,
+    afterDatasetsDraw(chart) {
+      const { ctx: c } = chart;
+      c.save();
+      c.font = 'bold 11px Arial, Helvetica, sans-serif';
+      c.textAlign = 'center';
+      c.textBaseline = 'bottom';
+      c.fillStyle = '#0f172a';
+
+      if (stacked) {
+        // No modo empilhado: um rótulo de total acima da coluna inteira
+        const metaList = chart.data.datasets.map((_, i) => chart.getDatasetMeta(i));
+        labels.forEach((_, idx) => {
+          const total = totaisPorPessoa[idx];
+          if (!total) return;
+          let topY = null, barX = null;
+          for (let d = metaList.length - 1; d >= 0; d--) {
+            const meta = metaList[d];
+            if (meta?.data[idx] && !meta.hidden && chart.data.datasets[d].data[idx] > 0) {
+              topY = meta.data[idx].y;
+              barX = meta.data[idx].x;
+              break;
             }
-            if (topY !== null && barX !== null) {
-              ctx.strokeStyle = '#ffffff';
-              ctx.lineWidth = 3;
-              ctx.strokeText(`${total}`, barX, topY - 3);
-              ctx.fillText(`${total}`, barX, topY - 3);
-            }
+          }
+          if (topY !== null) {
+            c.strokeStyle = '#ffffff'; c.lineWidth = 3;
+            c.strokeText(`${total}`, barX, topY - 3);
+            c.fillText(`${total}`, barX, topY - 3);
           }
         });
-        ctx.restore();
-      }
-    };
-
-    state.charts.modelista = new Chart(ctx, {
-      type: 'bar',
-      plugins: [stackedBarLabelsPlugin],
-      data: {
-        labels: labels,
-        datasets: [
-          { label: 'Aprovada', data: modelistas.map(x => x.aprovada), backgroundColor: '#16A34A', stack: 'stack1', barPercentage: 0.85, categoryPercentage: 0.85 },
-          { label: 'Aprovada c/ Ajustes', data: modelistas.map(x => x.aprovada_ajustes), backgroundColor: '#38BDF8', stack: 'stack1', barPercentage: 0.85, categoryPercentage: 0.85 },
-          { label: 'Reprovada', data: modelistas.map(x => x.reprovada), backgroundColor: '#DC2626', stack: 'stack1', barPercentage: 0.85, categoryPercentage: 0.85 },
-          { label: 'Repilotagem', data: modelistas.map(x => x.repilotagem), backgroundColor: '#D97706', stack: 'stack1', barPercentage: 0.85, categoryPercentage: 0.85 },
-          { label: 'Standby', data: modelistas.map(x => x.standby), backgroundColor: '#94A3B8', stack: 'stack1', barPercentage: 0.85, categoryPercentage: 0.85 }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-          padding: { top: 16, bottom: 2, left: 4, right: 4 }
-        },
-        plugins: { legend: { position: 'bottom' } },
-        scales: {
-          x: { stacked: true },
-          y: { stacked: true, beginAtZero: true, suggestedMax: suggestedMax, grace: 1, ticks: { precision: 0 } }
-        }
-      }
-    });
-  } else {
-    // Modo Agrupado SEM LACUNAS VAZIAS com BARRAS 200% A MAIS EM LARGURA (Super robustas e gordinhas)
-    const datasetsConfig = [
-      { key: 'aprovada', label: 'Aprovada', color: '#16A34A' },
-      { key: 'aprovada_ajustes', label: 'Aprovada c/ Ajustes', color: '#38BDF8' },
-      { key: 'reprovada', label: 'Reprovada', color: '#DC2626' },
-      { key: 'repilotagem', label: 'Repilotagem', color: '#D97706' },
-      { key: 'standby', label: 'Standby', color: '#94A3B8' }
-    ];
-
-    // Mapear coordenadas no eixo linear com barPercentage e categoryPercentage maximizados
-    const datasets = datasetsConfig.map(cfg => ({
-      label: cfg.label,
-      backgroundColor: cfg.color,
-      data: [],
-      barPercentage: 0.98,
-      categoryPercentage: 0.98
-    }));
-
-    const xTicksLabels = {};
-    let maxVal = 0;
-    // Largura das barras ampliada em 200% a mais (3x da largura original)
-    const step = 4.5;
-    const barWidth = 1.35;
-
-    modelistas.forEach((mod, modIdx) => {
-      const center = (modIdx + 1) * step;
-      xTicksLabels[center] = mod.modelista;
-
-      // Filtrar apenas situações com valor > 0
-      const activeEntries = datasetsConfig
-        .map((cfg, dsIdx) => ({ dsIdx, key: cfg.key, val: mod[cfg.key] || 0 }))
-        .filter(e => e.val > 0);
-
-      const count = activeEntries.length;
-      const startX = center - ((count - 1) * barWidth) / 2;
-
-      activeEntries.forEach((entry, i) => {
-        const xPos = startX + i * barWidth;
-        datasets[entry.dsIdx].data.push({ x: xPos, y: entry.val });
-        if (entry.val > maxVal) maxVal = entry.val;
-      });
-    });
-
-    const suggestedMax = Math.ceil(maxVal * 1.35) + 1;
-
-    // Plugin inline para desenhar o valor exato da quantidade em cima de cada barra
-    const modelistaBarLabelsPlugin = {
-      id: 'modelistaBarLabels',
-      afterDatasetsDraw(chart) {
-        const { ctx } = chart;
-        ctx.save();
-        ctx.font = 'bold 11px Arial, Helvetica, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillStyle = '#0f172a';
-
-        chart.data.datasets.forEach((ds, dsIdx) => {
-          const meta = chart.getDatasetMeta(dsIdx);
-          if (!meta || meta.hidden) return;
-
-          meta.data.forEach((bar, ptIdx) => {
-            const rawVal = ds.data[ptIdx];
-            const val = typeof rawVal === 'object' && rawVal !== null ? rawVal.y : rawVal;
-            if (val > 0 && bar && bar.x !== undefined && bar.y !== undefined) {
-              ctx.strokeStyle = '#ffffff';
-              ctx.lineWidth = 3;
-              ctx.strokeText(`${val}`, bar.x, bar.y - 3);
-              ctx.fillText(`${val}`, bar.x, bar.y - 3);
-            }
-          });
-        });
-        ctx.restore();
-      }
-    };
-
-    state.charts.modelista = new Chart(ctx, {
-      type: 'bar',
-      plugins: [modelistaBarLabelsPlugin],
-      data: { datasets: datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-          padding: { top: 16, bottom: 2, left: 4, right: 4 }
-        },
-        plugins: {
-          legend: { position: 'bottom' },
-          tooltip: {
-            callbacks: {
-              title: (ctxList) => {
-                const item = ctxList[0];
-                const xVal = item.raw.x;
-                // Encontrar o modelista mais próximo
-                let closestMod = '';
-                let minDist = 999;
-                for (const [pos, name] of Object.entries(xTicksLabels)) {
-                  const dist = Math.abs(xVal - parseFloat(pos));
-                  if (dist < minDist) {
-                    minDist = dist;
-                    closestMod = name;
-                  }
-                }
-                return closestMod;
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            type: 'linear',
-            grid: { display: false },
-            min: 0,
-            max: (modelistas.length + 1) * step,
-            ticks: {
-              stepSize: step,
-              callback: (val) => xTicksLabels[val] || ''
-            }
-          },
-          y: {
-            beginAtZero: true,
-            suggestedMax: suggestedMax,
-            grace: 1,
-            title: { display: true, text: 'Quantidade de OPs' },
-            ticks: { precision: 0 }
-          }
-        }
-      }
-    });
-  }
-}
-
-// Gráfico de Desempenho por Pilotista (espelho do de Modelista)
-function renderPilotistaChart(pilotistas) {
-  const canvas = document.getElementById('chart-pilotista');
-  if (!canvas || typeof Chart === 'undefined') return;
-
-  if (state.charts.pilotista) {
-    state.charts.pilotista.destroy();
-  }
-
-  const stacked = state.pilotistaStacked;
-  const ctx = canvas.getContext('2d');
-
-  if (stacked) {
-    const labels = pilotistas.map(x => x.pilotista);
-    const maxStacked = Math.max(...pilotistas.map(p => p.aprovada + p.aprovada_ajustes + p.reprovada + p.repilotagem + p.standby), 0);
-    const suggestedMax = Math.ceil(maxStacked * 1.35) + 1;
-
-    const stackedBarLabelsPlugin = {
-      id: 'pilotistaStackedLabels',
-      afterDatasetsDraw(chart) {
-        const { ctx: c, } = chart;
-        const metaList = chart.data.datasets.map((d, i) => chart.getDatasetMeta(i));
-        if (!metaList.length) return;
-        c.save();
-        c.font = 'bold 11px Arial, Helvetica, sans-serif';
-        c.textAlign = 'center';
-        c.textBaseline = 'bottom';
-        c.fillStyle = '#0f172a';
-        labels.forEach((lab, idx) => {
-          const pil = pilotistas[idx];
-          const total = (pil.aprovada || 0) + (pil.aprovada_ajustes || 0) + (pil.reprovada || 0) + (pil.repilotagem || 0) + (pil.standby || 0);
-          if (total > 0) {
-            let topY = null, barX = null;
-            for (let d = metaList.length - 1; d >= 0; d--) {
-              const meta = metaList[d];
-              if (meta && meta.data[idx] && !meta.hidden) {
-                const el = meta.data[idx];
-                if (el.y !== undefined && chart.data.datasets[d].data[idx] > 0) {
-                  topY = el.y; barX = el.x; break;
-                }
-              }
-            }
-            if (topY !== null && barX !== null) {
-              c.strokeStyle = '#ffffff'; c.lineWidth = 3;
-              c.strokeText(`${total}`, barX, topY - 3);
-              c.fillText(`${total}`, barX, topY - 3);
-            }
-          }
-        });
-        c.restore();
-      }
-    };
-
-    state.charts.pilotista = new Chart(ctx, {
-      type: 'bar',
-      plugins: [stackedBarLabelsPlugin],
-      data: {
-        labels: labels,
-        datasets: [
-          { label: 'Aprovada', data: pilotistas.map(x => x.aprovada), backgroundColor: '#16A34A', stack: 'stack1', barPercentage: 0.85, categoryPercentage: 0.85 },
-          { label: 'Aprovada c/ Ajustes', data: pilotistas.map(x => x.aprovada_ajustes), backgroundColor: '#38BDF8', stack: 'stack1', barPercentage: 0.85, categoryPercentage: 0.85 },
-          { label: 'Reprovada', data: pilotistas.map(x => x.reprovada), backgroundColor: '#DC2626', stack: 'stack1', barPercentage: 0.85, categoryPercentage: 0.85 },
-          { label: 'Repilotagem', data: pilotistas.map(x => x.repilotagem), backgroundColor: '#D97706', stack: 'stack1', barPercentage: 0.85, categoryPercentage: 0.85 },
-          { label: 'Standby', data: pilotistas.map(x => x.standby), backgroundColor: '#94A3B8', stack: 'stack1', barPercentage: 0.85, categoryPercentage: 0.85 }
-        ]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        layout: { padding: { top: 16, bottom: 2, left: 4, right: 4 } },
-        plugins: { legend: { position: 'bottom' } },
-        scales: {
-          x: { stacked: true },
-          y: { stacked: true, beginAtZero: true, suggestedMax: suggestedMax, grace: 1, ticks: { precision: 0 } }
-        }
-      }
-    });
-  } else {
-    const datasetsConfig = [
-      { key: 'aprovada', label: 'Aprovada', color: '#16A34A' },
-      { key: 'aprovada_ajustes', label: 'Aprovada c/ Ajustes', color: '#38BDF8' },
-      { key: 'reprovada', label: 'Reprovada', color: '#DC2626' },
-      { key: 'repilotagem', label: 'Repilotagem', color: '#D97706' },
-      { key: 'standby', label: 'Standby', color: '#94A3B8' }
-    ];
-    const datasets = datasetsConfig.map(cfg => ({
-      label: cfg.label, backgroundColor: cfg.color, data: [],
-      barPercentage: 0.98, categoryPercentage: 0.98
-    }));
-    const xTicksLabels = {};
-    let maxVal = 0;
-    const step = 4.5, barWidth = 1.35;
-
-    pilotistas.forEach((pil, pilIdx) => {
-      const center = (pilIdx + 1) * step;
-      xTicksLabels[center] = pil.pilotista;
-      const activeEntries = datasetsConfig
-        .map((cfg, dsIdx) => ({ dsIdx, key: cfg.key, val: pil[cfg.key] || 0 }))
-        .filter(e => e.val > 0);
-      const count = activeEntries.length;
-      const startX = center - ((count - 1) * barWidth) / 2;
-      activeEntries.forEach((entry, i) => {
-        const xPos = startX + i * barWidth;
-        datasets[entry.dsIdx].data.push({ x: xPos, y: entry.val });
-        if (entry.val > maxVal) maxVal = entry.val;
-      });
-    });
-
-    const suggestedMax = Math.ceil(maxVal * 1.35) + 1;
-
-    const pilotistaBarLabelsPlugin = {
-      id: 'pilotistaBarLabels',
-      afterDatasetsDraw(chart) {
-        const { ctx: c } = chart;
-        c.save();
-        c.font = 'bold 11px Arial, Helvetica, sans-serif';
-        c.textAlign = 'center'; c.textBaseline = 'bottom'; c.fillStyle = '#0f172a';
+      } else {
+        // No modo agrupado: valor em cima de cada barra individual
         chart.data.datasets.forEach((ds, dsIdx) => {
           const meta = chart.getDatasetMeta(dsIdx);
           if (!meta || meta.hidden) return;
           meta.data.forEach((bar, ptIdx) => {
-            const rawVal = ds.data[ptIdx];
-            const val = typeof rawVal === 'object' && rawVal !== null ? rawVal.y : rawVal;
-            if (val > 0 && bar && bar.x !== undefined && bar.y !== undefined) {
+            const val = ds.data[ptIdx];
+            if (val > 0 && bar?.x !== undefined) {
               c.strokeStyle = '#ffffff'; c.lineWidth = 3;
               c.strokeText(`${val}`, bar.x, bar.y - 3);
               c.fillText(`${val}`, bar.x, bar.y - 3);
             }
           });
         });
-        c.restore();
       }
-    };
+      c.restore();
+    }
+  };
 
-    state.charts.pilotista = new Chart(ctx, {
-      type: 'bar',
-      plugins: [pilotistaBarLabelsPlugin],
-      data: { datasets: datasets },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        layout: { padding: { top: 16, bottom: 2, left: 4, right: 4 } },
-        plugins: {
-          legend: { position: 'bottom' },
-          tooltip: {
-            callbacks: {
-              title: (ctxList) => {
-                const item = ctxList[0];
-                const xVal = item.raw.x;
-                let closestPil = '';
-                let minDist = 999;
-                for (const [pos, name] of Object.entries(xTicksLabels)) {
-                  const dist = Math.abs(xVal - parseFloat(pos));
-                  if (dist < minDist) { minDist = dist; closestPil = name; }
-                }
-                return closestPil;
-              }
+  // Plugin: linhas divisórias verticais entre cada pessoa (modo agrupado)
+  const separatorPlugin = {
+    id: `${chartKey}Separators`,
+    afterDraw(chart) {
+      if (stacked) return; // Não precisa no empilhado (eixo categórico já separa)
+      const { ctx: c, chartArea, scales } = chart;
+      if (!chartArea || !scales.x) return;
+
+      c.save();
+      c.strokeStyle = '#E2E8F0';
+      c.lineWidth = 1;
+      c.setLineDash([4, 3]);
+
+      // Uma linha entre cada par de categorias
+      for (let i = 0; i < labels.length - 1; i++) {
+        // Ponto médio entre o centro de i e o centro de i+1
+        const xI  = scales.x.getPixelForValue(i);
+        const xI1 = scales.x.getPixelForValue(i + 1);
+        const xMid = (xI + xI1) / 2;
+
+        c.beginPath();
+        c.moveTo(xMid, chartArea.top);
+        c.lineTo(xMid, chartArea.bottom);
+        c.stroke();
+      }
+
+      c.setLineDash([]);
+      c.restore();
+    }
+  };
+
+  const maxVal = stacked
+    ? Math.max(...totaisPorPessoa, 0)
+    : Math.max(...datasetsConfig.flatMap(cfg => pessoas.map(p => p[cfg.key] || 0)), 0);
+  const suggestedMax = Math.ceil(maxVal * 1.35) + 1;
+
+  state.charts[chartKey] = new Chart(ctx, {
+    type: 'bar',
+    plugins: [labelsPlugin, separatorPlugin],
+    data: {
+      labels,
+      datasets: datasetsConfig.map(cfg => ({
+        label: cfg.label,
+        data: pessoas.map(p => p[cfg.key] || 0),
+        backgroundColor: cfg.color,
+        // No empilhado todas as barras formam uma coluna; no agrupado ficam lado a lado
+        ...(stacked ? { stack: 'stack1' } : {}),
+        // Agrupado: barras bem mais estreitas para o grupo não parecer largo demais
+        barPercentage:      stacked ? 0.70 : 0.55,
+        categoryPercentage: stacked ? 0.80 : 0.75
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 22, bottom: 2, left: 4, right: 4 } },
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            title:  (items) => items[0].label,
+            label:  (item)  => ` ${item.dataset.label}: ${item.raw}`,
+            footer: (items) => {
+              const total = totaisPorPessoa[items[0].dataIndex];
+              return `Total: ${total}`;
             }
           }
-        },
-        scales: {
-          x: {
-            type: 'linear', grid: { display: false },
-            min: 0, max: (pilotistas.length + 1) * step,
-            ticks: { stepSize: step, callback: (val) => xTicksLabels[val] || '' }
-          },
-          y: {
-            beginAtZero: true, suggestedMax: suggestedMax, grace: 1,
-            title: { display: true, text: 'Quantidade de OPs' },
-            ticks: { precision: 0 }
+        }
+      },
+      scales: {
+        x: {
+          stacked: stacked,
+          grid: { display: false },
+          ticks: {
+            maxRotation: 40,
+            minRotation: 20,
+            autoSkip: false,
+            font: { size: 11 }
           }
+        },
+        y: {
+          stacked: stacked,
+          beginAtZero: true,
+          suggestedMax,
+          grace: 1,
+          title: { display: true, text: 'Quantidade de OPs' },
+          ticks: { precision: 0 }
         }
       }
-    });
-  }
+    }
+  });
+}
+
+function renderModelistaChart(modelistas) {
+  renderDesempenhoChart({
+    canvasId: 'chart-modelista',
+    chartKey: 'modelista',
+    stacked: state.modelistaStacked,
+    pessoas: modelistas,
+    pessoaKey: 'modelista'
+  });
+}
+
+// Gráfico de Desempenho por Pilotista (espelho do de Modelista)
+function renderPilotistaChart(pilotistas) {
+  renderDesempenhoChart({
+    canvasId: 'chart-pilotista',
+    chartKey: 'pilotista',
+    stacked: state.pilotistaStacked,
+    pessoas: pilotistas,
+    pessoaKey: 'pilotista'
+  });
 }
 
 // ETAPA 3: Recalcular e Renderizar Taxa de Conversão de Repilotagens com Filtro de Tipo e Pessoa
@@ -2316,30 +2115,32 @@ function recalculateAndRenderRepilotagemEfficiency(rawOps = [], tipo = 'Todos', 
     repOps = repOps.filter(x => (x.pilotista || '').toUpperCase() === pessoa.toUpperCase());
   }
 
-  const repTotal = repOps.length;
-  const repAprov = repOps.filter(x => {
-    const s = (x.situacao || '').toUpperCase();
-    return s === 'APROVADA' || s === 'APROVADA COM AJUSTES';
-  }).length;
+  const repTotal   = repOps.length;
+  const repAprov   = repOps.filter(x => { const s = (x.situacao || '').toUpperCase(); return s === 'APROVADA' || s === 'APROVADA COM AJUSTES'; }).length;
   const repMantida = repOps.filter(x => (x.situacao || '').toUpperCase() === 'REPILOTAGEM').length;
-  const repReprov = repOps.filter(x => (x.situacao || '').toUpperCase() === 'REPROVADA').length;
+  const repReprov  = repOps.filter(x => (x.situacao || '').toUpperCase() === 'REPROVADA').length;
   const repStandby = repOps.filter(x => (x.situacao || '').toUpperCase() === 'STANDBY').length;
-  const taxaConversao = repTotal > 0 ? ((repAprov / repTotal) * 100).toFixed(1) : '0.0';
 
-  const taxaEl = document.getElementById('taxa-conversao');
-  const subtextEl = document.getElementById('repilotagem-conversao-subtext');
+  const pct = (n) => repTotal > 0 ? ((n / repTotal) * 100).toFixed(1) : '0.0';
+
   const canvas = document.getElementById('chart-repilotagem-rosca');
+
+  // Helper para atualizar os 3 cards de KPI
+  const updateCards = (aprov, reprov, mantida, total) => {
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setEl('rep-aprovadas-valor',  aprov);
+    setEl('rep-aprovadas-pct',    `${total > 0 ? ((aprov  / total) * 100).toFixed(1) : '0.0'}% das repilotagens`);
+    setEl('rep-reprovadas-valor', reprov);
+    setEl('rep-reprovadas-pct',   `${total > 0 ? ((reprov / total) * 100).toFixed(1) : '0.0'}% das repilotagens`);
+    setEl('rep-mantida-valor',    mantida);
+    setEl('rep-mantida-pct',      `${total > 0 ? ((mantida / total) * 100).toFixed(1) : '0.0'}% das repilotagens`);
+  };
 
   // Se filtrou por tipo mas não há dados preenchidos para esse campo, mostrar aviso
   if (campoFiltro && !temDadosDeTipo) {
-    if (taxaEl) taxaEl.textContent = '—';
-    if (subtextEl) subtextEl.textContent = `Campo "${tipo.toLowerCase()}" não preenchido nos registros`;
+    updateCards('—', '—', '—', 0);
     if (canvas) {
-      // Destruir gráfico anterior e mostrar mensagem no lugar
-      if (state.charts.repilotagemRosca) {
-        state.charts.repilotagemRosca.destroy();
-        state.charts.repilotagemRosca = null;
-      }
+      if (state.charts.repilotagemRosca) { state.charts.repilotagemRosca.destroy(); state.charts.repilotagemRosca = null; }
       const parent = canvas.parentElement;
       let aviso = parent.querySelector('.sem-dados-aviso');
       if (!aviso) {
@@ -2349,7 +2150,7 @@ function recalculateAndRenderRepilotagemEfficiency(rawOps = [], tipo = 'Todos', 
         parent.appendChild(aviso);
       }
       canvas.style.display = 'none';
-      aviso.textContent = `Nenhum registro possui o campo "${tipo.toLowerCase()}" preenchido. Cadastre novas OPs com este campo para visualizar a análise por ${tipo.toLowerCase()}.`;
+      aviso.textContent = `Nenhum registro possui o campo "${tipo.toLowerCase()}" preenchido.`;
     }
     return;
   }
@@ -2357,40 +2158,43 @@ function recalculateAndRenderRepilotagemEfficiency(rawOps = [], tipo = 'Todos', 
   // Restaurar canvas caso estivesse oculto
   if (canvas) {
     canvas.style.display = '';
-    const parent = canvas.parentElement;
-    const aviso = parent ? parent.querySelector('.sem-dados-aviso') : null;
+    const aviso = canvas.parentElement?.querySelector('.sem-dados-aviso');
     if (aviso) aviso.remove();
   }
 
-  if (taxaEl) taxaEl.textContent = `${taxaConversao}%`;
-  if (subtextEl) {
-    let filtroLabel = '';
-    if (tipo !== 'Todos' && pessoa !== 'Todos') filtroLabel = ` (${tipo}: ${pessoa})`;
-    else if (tipo !== 'Todos') filtroLabel = ` (${tipo}s)`;
-    subtextEl.textContent = `${repAprov} de ${repTotal} repilotagens aprovadas${filtroLabel}`;
-  }
+  updateCards(repAprov, repReprov, repMantida, repTotal);
 
   if (!canvas || typeof Chart === 'undefined') return;
 
-  if (state.charts.repilotagemRosca) {
-    state.charts.repilotagemRosca.destroy();
-  }
+  if (state.charts.repilotagemRosca) state.charts.repilotagemRosca.destroy();
 
   const ctx = canvas.getContext('2d');
   state.charts.repilotagemRosca = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['Aprovada', 'Repilotagem', 'Reprovada', 'Standby'],
+      labels: ['Aprovada', 'Em Repilotagem', 'Reprovada', 'Standby'],
       datasets: [{
         data: [repAprov, repMantida, repReprov, repStandby],
         backgroundColor: ['#16A34A', '#D97706', '#DC2626', '#94A3B8'],
-        borderWidth: 2
+        borderWidth: 2,
+        borderColor: '#ffffff'
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom' } }
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            label: (item) => {
+              const val = item.raw;
+              const pctVal = repTotal > 0 ? ((val / repTotal) * 100).toFixed(1) : '0.0';
+              return ` ${item.label}: ${val} (${pctVal}%)`;
+            }
+          }
+        }
+      }
     }
   });
 }

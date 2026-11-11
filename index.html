@@ -373,7 +373,7 @@
               </label>
             </div>
           </div>
-          <div class="chart-container chart-container-wide">
+          <div class="chart-container chart-container-wide chart-container-desempenho">
             <canvas id="chart-modelista" aria-label="Gráfico de desempenho por modelista" role="img"></canvas>
           </div>
         </section>
@@ -390,7 +390,7 @@
               </label>
             </div>
           </div>
-          <div class="chart-container chart-container-wide">
+          <div class="chart-container chart-container-wide chart-container-desempenho">
             <canvas id="chart-pilotista" aria-label="Gráfico de desempenho por pilotista" role="img"></canvas>
           </div>
         </section>
@@ -411,12 +411,24 @@
               </select>
             </div>
           </div>
-          <div class="efficiency-row">
-            <article class="efficiency-card" aria-label="Taxa de conversão de repilotagens">
-              <span class="efficiency-label">Taxa de Conversão de Repilotagens</span>
-              <span id="taxa-conversao" class="efficiency-value">0%</span>
-              <span class="efficiency-subtext" id="repilotagem-conversao-subtext">0 de 0 repilotagens aprovadas</span>
-            </article>
+          <div id="efficiency-row" class="efficiency-row">
+            <div class="efficiency-kpi-group">
+              <article class="efficiency-card efficiency-card-green" aria-label="Repilotagens aprovadas">
+                <span class="efficiency-label">Aprovadas</span>
+                <span id="rep-aprovadas-valor" class="efficiency-value">0</span>
+                <span class="efficiency-subtext" id="rep-aprovadas-pct">0% das repilotagens</span>
+              </article>
+              <article class="efficiency-card efficiency-card-red" aria-label="Repilotagens reprovadas">
+                <span class="efficiency-label">Reprovadas</span>
+                <span id="rep-reprovadas-valor" class="efficiency-value">0</span>
+                <span class="efficiency-subtext" id="rep-reprovadas-pct">0% das repilotagens</span>
+              </article>
+              <article class="efficiency-card efficiency-card-orange" aria-label="Ainda em repilotagem">
+                <span class="efficiency-label">Em Repilotagem</span>
+                <span id="rep-mantida-valor" class="efficiency-value">0</span>
+                <span class="efficiency-subtext" id="rep-mantida-pct">0% das repilotagens</span>
+              </article>
+            </div>
             <div class="chart-container chart-container-donut">
               <canvas id="chart-repilotagem-rosca" aria-label="Gráfico de rosca da eficiência em repilotagens" role="img"></canvas>
             </div>
