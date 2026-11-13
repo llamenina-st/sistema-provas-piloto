@@ -225,9 +225,9 @@
               <span class="kpi-meta-badge" id="meta-aprovada-badge">Meta: ≥ 80%</span>
             </div>
           </article>
-          <!-- 4. Em Repilotagem: OPs ainda aguardando resolução -->
+          <!-- 4. Em Andamento: OPs ainda aguardando resolução -->
           <article id="kpi-em-repilotagem" class="kpi-card kpi-yellow">
-            <span class="kpi-label">EM REPILOTAGEM</span>
+            <span class="kpi-label">EM ANDAMENTO</span>
             <span class="kpi-value">0</span>
             <span class="kpi-subtext" id="kpi-em-repilotagem-pct">0.0% do total</span>
           </article>
@@ -412,6 +412,9 @@
             </div>
           </div>
           <div id="efficiency-row" class="efficiency-row">
+            <div class="efficiency-donut-container">
+              <canvas id="chart-repilotagem-rosca" aria-label="Gráfico de rosca da eficiência em repilotagens" role="img"></canvas>
+            </div>
             <div class="efficiency-kpi-group">
               <article class="efficiency-card efficiency-card-green" aria-label="Repilotagens aprovadas">
                 <span class="efficiency-label">Aprovadas</span>
@@ -429,13 +432,8 @@
                 <span class="efficiency-subtext" id="rep-mantida-pct">0% das repilotagens</span>
               </article>
             </div>
-            <div class="chart-container chart-container-donut">
-              <canvas id="chart-repilotagem-rosca" aria-label="Gráfico de rosca da eficiência em repilotagens" role="img"></canvas>
-            </div>
           </div>
         </section>
-
-        <!-- Painel de Análise Detalhada de Observações e Motivos -->
         <section class="dashboard-section" id="section-observacoes" aria-label="Análise de Observações e Motivos">
           <div class="section-title-bar">
             <h2 class="section-title">Análise Detalhada de Observações e Frequência de Motivos</h2>

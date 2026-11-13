@@ -836,7 +836,7 @@ body.sidebar-collapsed #main-content {
 /* Painel de Eficiência em Repilotagens */
 .efficiency-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: 1.25rem;
   align-items: center;
   background: var(--color-card-bg);
@@ -845,6 +845,13 @@ body.sidebar-collapsed #main-content {
   padding: 1.25rem;
   margin-bottom: 1.5rem;
   box-shadow: var(--shadow-sm);
+}
+
+/* Container da pizza — altura generosa para ser o destaque */
+.efficiency-donut-container {
+  position: relative;
+  height: 320px;
+  width: 100%;
 }
 
 .efficiency-kpi-group {
@@ -1542,7 +1549,9 @@ input:checked + .slider:before {
     flex: 1;
     min-width: 140px;
   }
-  .chart-container-donut {
+  .efficiency-donut-container {
+    height: 280px;
+    max-width: 400px;
     margin: 0 auto;
   }
   .form-row.three-cols {
@@ -1766,6 +1775,11 @@ input:checked + .slider:before {
     grid-template-columns: 1fr;
     padding: 1rem;
     gap: 1rem;
+  }
+  
+  .efficiency-donut-container {
+    height: 260px;
+    max-width: 100%;
   }
   
   .efficiency-kpi-group {

@@ -2201,9 +2201,9 @@ function recalculateAndRenderRepilotagemEfficiency(rawOps = [], tipo = 'Todos', 
         const endAngle   = arc.endAngle;
         const midAngle   = (startAngle + endAngle) / 2;
 
-        // Posiciona o label a ~115% do raio externo
+        // Posiciona o label a ~120% do raio externo
         const outerRadius = arc.outerRadius;
-        const r           = outerRadius * 1.15;
+        const r           = outerRadius * 1.20;
         const x           = arc.x + Math.cos(midAngle) * r;
         const y           = arc.y + Math.sin(midAngle) * r;
 
@@ -2241,7 +2241,7 @@ function recalculateAndRenderRepilotagemEfficiency(rawOps = [], tipo = 'Todos', 
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      layout: { padding: 28 },   // espaço para os labels externos
+      layout: { padding: 40 },   // espaço para os labels externos
       plugins: {
         legend: { position: 'bottom' },
         tooltip: {
