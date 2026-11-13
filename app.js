@@ -583,27 +583,23 @@ function calculateDashboardLocally(filters = {}) {
   const paretoReprovacao = buildPareto('REPROVADA');
   const paretoAprovacaoAjustes = buildPareto('APROVADA COM AJUSTES');
 
-  // 4. Modelistas — apenas repilotagens de serviço MODELAGEM
-  // Filtra OPs que são repilotagem (situacao = REPILOTAGEM) com serviço de MODELAGEM
-  const opsRepModelista = ops.filter(x =>
-    (x.situacao || '').toUpperCase() === 'REPILOTAGEM' &&
-    (x.servico  || '').toUpperCase() === 'MODELAGEM'
-  );
-  const modelistasUnicos = [...new Set(opsRepModelista.map(x => x.modelista || 'Não informado'))];
+  // 4. Modelistas — todas as OPs onde a modelista está preenchida, todos os status
+  const opsComModelista = ops.filter(x => (x.modelista || '').trim() !== '');
+  const modelistasUnicos = [...new Set(opsComModelista.map(x => x.modelista))];
   const modelistas = modelistasUnicos.map(mod => {
-    const mOps = opsRepModelista.filter(x => (x.modelista || 'Não informado') === mod);
+    const mOps = opsComModelista.filter(x => x.modelista === mod);
     return {
-      modelista: mod,
-      // Neste contexto todas as OPs já têm situacao=REPILOTAGEM;
-      // os campos abaixo ficam prontos para quando o filtro for expandido no futuro
-      aprovada: 0,
-      aprovada_ajustes: 0,
-      reprovada: 0,
-      repilotagem: mOps.length,   // todas são repilotagem por definição
-      standby: 0
+      modelista:        mod,
+      aprovada:         mOps.filter(x => (x.situacao || '').toUpperCase() === 'APROVADA').length,
+      aprovada_ajustes: mOps.filter(x => (x.situacao || '').toUpperCase() === 'APROVADA COM AJUSTES').length,
+      reprovada:        mOps.filter(x => (x.situacao || '').toUpperCase() === 'REPROVADA').length,
+      repilotagem:      mOps.filter(x => (x.situacao || '').toUpperCase() === 'REPILOTAGEM').length,
+      standby:          mOps.filter(x => (x.situacao || '').toUpperCase() === 'STANDBY').length
     };
-  }).filter(m => m.repilotagem > 0)
-    .sort((a, b) => b.repilotagem - a.repilotagem);
+  }).sort((a, b) =>
+    (b.aprovada + b.aprovada_ajustes + b.reprovada + b.repilotagem + b.standby) -
+    (a.aprovada + a.aprovada_ajustes + a.reprovada + a.repilotagem + a.standby)
+  );
 
   // 4b. Pilotistas
   const pilotistasUnicos = [...new Set(ops.map(x => x.pilotista || 'Não informado'))];
