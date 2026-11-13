@@ -2177,8 +2177,58 @@ function recalculateAndRenderRepilotagemEfficiency(rawOps = [], tipo = 'Todos', 
   if (state.charts.repilotagemRosca) state.charts.repilotagemRosca.destroy();
 
   const ctx = canvas.getContext('2d');
+
+  // Plugin inline: desenha valor + % na parte externa de cada fatia
+  const doughnutLabelsPlugin = {
+    id: 'repilotagemRoscaLabels',
+    afterDraw(chart) {
+      const { ctx: c, chartArea, data } = chart;
+      const dataset = data.datasets[0];
+      const meta    = chart.getDatasetMeta(0);
+      const total   = dataset.data.reduce((s, v) => s + v, 0);
+      if (!total) return;
+
+      c.save();
+      c.font      = 'bold 11px Arial, Helvetica, sans-serif';
+      c.textAlign = 'center';
+
+      meta.data.forEach((arc, i) => {
+        const val = dataset.data[i];
+        if (!val) return;
+
+        // Ângulo do meio da fatia
+        const startAngle = arc.startAngle;
+        const endAngle   = arc.endAngle;
+        const midAngle   = (startAngle + endAngle) / 2;
+
+        // Posiciona o label a ~115% do raio externo
+        const outerRadius = arc.outerRadius;
+        const r           = outerRadius * 1.15;
+        const x           = arc.x + Math.cos(midAngle) * r;
+        const y           = arc.y + Math.sin(midAngle) * r;
+
+        const pct  = ((val / total) * 100).toFixed(1);
+        const line1 = `${val}`;
+        const line2 = `(${pct}%)`;
+
+        // Contorno branco para legibilidade sobre qualquer fundo
+        c.strokeStyle = '#ffffff';
+        c.lineWidth   = 3;
+        c.fillStyle   = '#1E293B';
+
+        c.strokeText(line1, x, y - 6);
+        c.fillText(line1,   x, y - 6);
+        c.strokeText(line2, x, y + 7);
+        c.fillText(line2,   x, y + 7);
+      });
+
+      c.restore();
+    }
+  };
+
   state.charts.repilotagemRosca = new Chart(ctx, {
     type: 'doughnut',
+    plugins: [doughnutLabelsPlugin],
     data: {
       labels: ['Aprovada', 'Em Andamento', 'Reprovada', 'Standby'],
       datasets: [{
@@ -2191,12 +2241,13 @@ function recalculateAndRenderRepilotagemEfficiency(rawOps = [], tipo = 'Todos', 
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: { padding: 28 },   // espaço para os labels externos
       plugins: {
         legend: { position: 'bottom' },
         tooltip: {
           callbacks: {
             label: (item) => {
-              const val = item.raw;
+              const val    = item.raw;
               const pctVal = repTotal > 0 ? ((val / repTotal) * 100).toFixed(1) : '0.0';
               return ` ${item.label}: ${val} (${pctVal}%)`;
             }
