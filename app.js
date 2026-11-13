@@ -583,19 +583,27 @@ function calculateDashboardLocally(filters = {}) {
   const paretoReprovacao = buildPareto('REPROVADA');
   const paretoAprovacaoAjustes = buildPareto('APROVADA COM AJUSTES');
 
-  // 4. Modelistas
-  const modelistasUnicos = [...new Set(ops.map(x => x.modelista || 'Não informado'))];
+  // 4. Modelistas — apenas repilotagens de serviço MODELAGEM
+  // Filtra OPs que são repilotagem (situacao = REPILOTAGEM) com serviço de MODELAGEM
+  const opsRepModelista = ops.filter(x =>
+    (x.situacao || '').toUpperCase() === 'REPILOTAGEM' &&
+    (x.servico  || '').toUpperCase() === 'MODELAGEM'
+  );
+  const modelistasUnicos = [...new Set(opsRepModelista.map(x => x.modelista || 'Não informado'))];
   const modelistas = modelistasUnicos.map(mod => {
-    const mOps = ops.filter(x => (x.modelista || 'Não informado') === mod);
+    const mOps = opsRepModelista.filter(x => (x.modelista || 'Não informado') === mod);
     return {
       modelista: mod,
-      aprovada: mOps.filter(x => (x.situacao || '').toUpperCase() === 'APROVADA').length,
-      aprovada_ajustes: mOps.filter(x => (x.situacao || '').toUpperCase() === 'APROVADA COM AJUSTES').length,
-      reprovada: mOps.filter(x => (x.situacao || '').toUpperCase() === 'REPROVADA').length,
-      repilotagem: mOps.filter(x => (x.situacao || '').toUpperCase() === 'REPILOTAGEM').length,
-      standby: mOps.filter(x => (x.situacao || '').toUpperCase() === 'STANDBY').length
+      // Neste contexto todas as OPs já têm situacao=REPILOTAGEM;
+      // os campos abaixo ficam prontos para quando o filtro for expandido no futuro
+      aprovada: 0,
+      aprovada_ajustes: 0,
+      reprovada: 0,
+      repilotagem: mOps.length,   // todas são repilotagem por definição
+      standby: 0
     };
-  });
+  }).filter(m => m.repilotagem > 0)
+    .sort((a, b) => b.repilotagem - a.repilotagem);
 
   // 4b. Pilotistas
   const pilotistasUnicos = [...new Set(ops.map(x => x.pilotista || 'Não informado'))];
@@ -2172,7 +2180,7 @@ function recalculateAndRenderRepilotagemEfficiency(rawOps = [], tipo = 'Todos', 
   state.charts.repilotagemRosca = new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: ['Aprovada', 'Em Repilotagem', 'Reprovada', 'Standby'],
+      labels: ['Aprovada', 'Em Andamento', 'Reprovada', 'Standby'],
       datasets: [{
         data: [repAprov, repMantida, repReprov, repStandby],
         backgroundColor: ['#16A34A', '#D97706', '#DC2626', '#94A3B8'],

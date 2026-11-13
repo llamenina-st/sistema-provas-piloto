@@ -450,40 +450,24 @@ function processarGetDashboardData(params) {
   var paretoReprovacao      = calcularPareto(registros, 'REPROVADA');
   var paretoAprovacaoAjustes = calcularPareto(registros, 'APROVADA COM AJUSTES');
 
-  // --- Breakdown por Modelista ---
+  // --- Breakdown por Modelista — apenas repilotagens de serviço MODELAGEM ---
   var mapaModelista = {};
   registros.forEach(function(r) {
-    var mod = String(r.modelista || 'SEM MODELISTA').trim();
     var situacao = normalizarSituacao(r.situacao);
-    var etapa = String(r.etapa || '').trim().toUpperCase();
+    var servico  = String(r.servico  || '').trim().toUpperCase();
 
+    // Considera apenas linhas com situacao REPILOTAGEM e serviço MODELAGEM
+    if (situacao !== 'REPILOTAGEM' || servico !== 'MODELAGEM') return;
+
+    var mod = String(r.modelista || 'SEM MODELISTA').trim();
     if (!mapaModelista[mod]) {
       mapaModelista[mod] = { modelista: mod, aprovada: 0, aprovada_ajustes: 0, reprovada: 0, repilotagem: 0, standby: 0 };
     }
-
-    switch (situacao) {
-      case 'APROVADA':
-        mapaModelista[mod].aprovada++;
-        break;
-      case 'APROVADA COM AJUSTES':
-        mapaModelista[mod].aprovada_ajustes++;
-        break;
-      case 'REPROVADA':
-        mapaModelista[mod].reprovada++;
-        break;
-      case 'STANDBY':
-        mapaModelista[mod].standby++;
-        break;
-    }
-    if (etapa !== 'PILOTO') mapaModelista[mod].repilotagem++;
+    mapaModelista[mod].repilotagem++;
   });
 
   var modelistas = Object.keys(mapaModelista).map(function(k) { return mapaModelista[k]; });
-  modelistas.sort(function(a, b) {
-    var totalA = a.aprovada + a.aprovada_ajustes + a.reprovada + a.repilotagem + a.standby;
-    var totalB = b.aprovada + b.aprovada_ajustes + b.reprovada + b.repilotagem + b.standby;
-    return totalB - totalA;
-  });
+  modelistas.sort(function(a, b) { return b.repilotagem - a.repilotagem; });
 
   // --- Breakdown por Pilotista ---
   var mapaPilotista = {};
